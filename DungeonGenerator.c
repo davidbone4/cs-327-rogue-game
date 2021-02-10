@@ -5,40 +5,55 @@
 int rows = 21;
 int cols = 80;
 
+typedef enum
+{
+    ROCK,
+    ROOM,
+    CORRIDOR,
+    UP,
+    DOWN
+} cellState;
+
 typedef struct Cells
 {
-    char* type[50];
-    int* hardness;
+    cellState type;
+    int hardness;
 } cell;
 
-cell *dungeon[][];
-
-void printCell(struct Cells cell);
+void printDungeon(cell **dungeon);
 
 int main(int argc, char const *argv[])
 {
 
-    typedef struct Cells;
 
-    // cell **dungeon = (cell **)malloc(rows * sizeof(cell *));
 
-    // for (int i = 0; i < rows; i++)
-    // {
-    //     dungeon[i] = (cell *)malloc(cols * sizeof(cell));
-    // }
+    cell **dungeon = (cell **)malloc(rows * sizeof(cell *));
 
-    struct cell* dungeon[rows][cols];
+    for (int i = 0; i < rows; i++)
+    {
+        dungeon[i] = (cell *)malloc(cols * sizeof(cell));
+    }
 
     for (int i = 0; i < rows; i++)
     {
         for (int j = 0; j < cols; j++)
         {
-            dungeon[i][j] = (cell *)malloc(sizeof(cell));
-            &(dungeon[i][j])->type = (char*) malloc(sizeof(char)*50);
-
+            dungeon[i][j].type = ROCK;
+            dungeon[i][j].hardness = 255;
         }
     }
 
+
+
+
+    printDungeon(dungeon);
+
+
+    return 0;
+}
+
+void printDungeon(cell **dungeon)
+{
     for (int i = 0; i < cols + 2; i++)
     {
         printf("-");
@@ -52,8 +67,26 @@ int main(int argc, char const *argv[])
         for (int j = 0; j < cols; j++)
         {
 
-            dungeon[i][j].type = "ROCK";
-            printCell(dungeon[i][j]);
+            if (dungeon[i][j].type == 0)
+            {
+                printf(" ");
+            }
+            else if (dungeon[i][j].type== 1)
+            {
+                printf(".");
+            }
+            else if (dungeon[i][j].type == 2)
+            {
+                printf("#");
+            }
+            else if (dungeon[i][j].type == 3)
+            {
+                printf("<");
+            }
+            else if (dungeon[i][j].type == 4)
+            {
+                printf(">");
+            }
         }
         printf("|\n");
     }
@@ -64,41 +97,4 @@ int main(int argc, char const *argv[])
     }
 
     printf("\n");
-
-    return 0;
-}
-
-void initaldungeon(struct cell **cell)
-{
-    for (int i = 0; i < rows; i++)
-    {
-        for (int j = 0; j < cols; j++)
-        {
-            cell[i][j].type =
-        }
-    }
-}
-
-void printCell(struct Cells cell)
-{
-    if (strcmp(cell.type, "ROCK"))
-    {
-        printf(" ");
-    }
-    else if (strcmp(cell.type, "ROOM"))
-    {
-        printf(".");
-    }
-    else if (strcmp(cell.type, "CORRIDOR"))
-    {
-        printf("#");
-    }
-    else if (strcmp(cell.type, "UP"))
-    {
-        printf("<");
-    }
-    else if (strcmp(cell.type, "DOWN"))
-    {
-        printf(">");
-    }
 }
