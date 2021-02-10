@@ -6,4 +6,10 @@
     => Rendered a dummy dungeon in the console.
     => Realized that I cant just use a 2d array of chars and I have to use an array of objects/cells. Looks like that will be a tomorrow progect.
 2/9/2021
-    =>tried to change the array of char to an array of structs. I can't figure it out. I will just deal with it next week when I have to.
+    => Restructured the dungeon as a 2d array of cell structs
+    => used an enum type to show cell type.
+    => implimented random room array generation (and used a struct for each room)
+    => imputted all rooms into the dungeon structure
+    => created logic for checking if any of the rooms were out of bounds, touching each other, overlapping, etc.
+    => fixed issue with rand() generating the same numbers.
+    => discovered that when I use srand() with the current time, it generates the same dungeon within each second.
