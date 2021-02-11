@@ -2,3 +2,4 @@
 *.dSYM
 .vscode/
 turnins/
+.DS_Store
