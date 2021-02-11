@@ -13,3 +13,9 @@
     => created logic for checking if any of the rooms were out of bounds, touching each other, overlapping, etc.
     => fixed issue with rand() generating the same numbers.
     => discovered that when I use srand() with the current time, it generates the same dungeon within each second.
+2/9/2021
+    => began work on corridor generation
+    => changed the room generation size, number etc.
+    => used mathematical distance to pave paths from room 0 -> 1 -> ... -> maxrooms -> 0
+    => fixed issue that caused sections of dungeon to be cut off
+    => implimented staircase gen
