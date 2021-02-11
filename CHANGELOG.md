@@ -19,3 +19,6 @@
     => used mathematical distance to pave paths from room 0 -> 1 -> ... -> maxrooms -> 0
     => fixed issue that caused sections of dungeon to be cut off
     => implimented staircase gen
+    => tested on pyrite server and got errors pertaining to the math.h library not being recognized. (this is the same problem mentioned in Piazza @94). I updated my make file to include -lm and it worked perfectly on the pyrite server.
+    => update README.md and CHANGELOG.md
+    => created zip and turned in assignment1.01
