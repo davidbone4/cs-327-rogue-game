@@ -42,7 +42,6 @@ int main(int argc, char const *argv[])
         dungeon[i] = (cell *)malloc(cols * sizeof(cell));
     }
 
-
     srand((unsigned)time(NULL));
 
     int numRooms = (rand() % (10 - 6 + 1)) + 6;
@@ -64,8 +63,8 @@ int main(int argc, char const *argv[])
         for (int i = 0; i < numRooms; i++)
         {
 
-            rooms[i].xSize = (rand() % (10 - 4 + 1)) + 4;
-            rooms[i].ySize = (rand() % (10 - 3 + 1)) + 3;
+            rooms[i].xSize = (rand() % (12 - 4 + 1)) + 4;
+            rooms[i].ySize = (rand() % (12 - 3 + 1)) + 3;
             rooms[i].xPos = (rand() % ((79 - rooms[i].xSize) - 1 + 1)) + 1;
             rooms[i].yPos = (rand() % ((20 - rooms[i].ySize) - 1 + 1)) + 1;
         }
@@ -112,18 +111,14 @@ int main(int argc, char const *argv[])
         }
     }
 
-
-
     for (int room = 0; room < numRooms; room++)
     {
-        if(room == 1){
-            int h = 2;
-        }
         int y = rooms[room].yPos + (rooms[room].ySize / 2);
         int x = rooms[room].xPos + (rooms[room].xSize / 2);
 
         int nextRoom = room + 1;
-        if(nextRoom >= numRooms){
+        if (nextRoom >= numRooms)
+        {
             nextRoom = 0;
         }
 
@@ -167,7 +162,6 @@ int main(int argc, char const *argv[])
                 dungeon[yNext][xNext].type = CORRIDOR;
             }
 
-
             if (yNext == rooms[nextRoom].yPos + (rooms[nextRoom].ySize / 2) && xNext == rooms[nextRoom].xPos + (rooms[nextRoom].xSize / 2))
             {
                 break;
@@ -176,6 +170,24 @@ int main(int argc, char const *argv[])
             y = yNext;
             x = xNext;
         }
+    }
+
+    int randroom = rand() % numRooms;
+    int y = rooms[randroom].yPos + (rand() % (rooms[randroom].ySize - 1) + 1);
+    int x = rooms[randroom].xPos + (rand() % (rooms[randroom].xSize - 1) + 1);
+    dungeon[y][x].type = UP;
+
+    while (1)
+    {
+        randroom = rand() % numRooms;
+        int y = rooms[randroom].yPos + (rand() % (rooms[randroom].ySize - 1) + 1);
+        int x = rooms[randroom].xPos + (rand() % (rooms[randroom].xSize - 1) + 1);
+        if (dungeon[y][x].type == UP)
+        {
+            continue;
+        }
+        dungeon[y][x].type = DOWN;
+        break;
     }
 
     printDungeon(dungeon);
