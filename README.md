@@ -15,6 +15,7 @@ Some things to note:
 I have implemented a simple hardness quality in all of the cells, but have not created a dynamically allocated room array (or perhaps I have, I am not exaclty sure)
 
 USAGE:
+
     >Make
     >./generator.out
 
