@@ -2,4 +2,4 @@
 #	rules to build target from dependencies
 
 DungeonGenerator: DungeonGenerator.c
-	gcc DungeonGenerator.c -o generator.out
+	gcc DungeonGenerator.c -o generator.out -lm
