@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 
 int rows = 21;
 int cols = 80;
@@ -41,12 +42,12 @@ int main(int argc, char const *argv[])
         dungeon[i] = (cell *)malloc(cols * sizeof(cell));
     }
 
-    srand((unsigned) time(NULL));
 
-    int numRooms = (rand() % (11 - 7 + 1)) + 7;
+    srand((unsigned)time(NULL));
+
+    int numRooms = (rand() % (10 - 6 + 1)) + 6;
 
     struct room rooms[numRooms];
-
 
     while (1)
     {
@@ -59,7 +60,6 @@ int main(int argc, char const *argv[])
                 dungeon[i][j].hardness = 255;
             }
         }
-
 
         for (int i = 0; i < numRooms; i++)
         {
@@ -112,7 +112,72 @@ int main(int argc, char const *argv[])
         }
     }
 
-    //dungeon[17][57].type = ROOM;
+
+
+    for (int room = 0; room < numRooms; room++)
+    {
+        if(room == 1){
+            int h = 2;
+        }
+        int y = rooms[room].yPos + (rooms[room].ySize / 2);
+        int x = rooms[room].xPos + (rooms[room].xSize / 2);
+
+        int nextRoom = room + 1;
+        if(nextRoom >= numRooms){
+            nextRoom = 0;
+        }
+
+        while (1)
+        {
+            double shortestdistance = sqrt(pow(y - (rooms[nextRoom].yPos + (rooms[nextRoom].ySize / 2)), 2) + pow(x - (rooms[nextRoom].xPos + (rooms[nextRoom].xSize / 2)), 2));
+            double distance = sqrt(pow((y - 1) - (rooms[nextRoom].yPos + (rooms[nextRoom].ySize / 2)), 2) + pow(x - (rooms[nextRoom].xPos + (rooms[nextRoom].xSize / 2)), 2));
+
+            int yNext = y;
+            int xNext = x;
+            if (shortestdistance > distance)
+            {
+                yNext = y - 1;
+                xNext = x;
+                shortestdistance = distance;
+            }
+            distance = sqrt(pow((y) - (rooms[nextRoom].yPos + (rooms[nextRoom].ySize / 2)), 2) + pow((x - 1) - (rooms[nextRoom].xPos + (rooms[nextRoom].xSize / 2)), 2));
+            if (shortestdistance > distance)
+            {
+                yNext = y;
+                xNext = x - 1;
+                shortestdistance = distance;
+            }
+            distance = sqrt(pow((y + 1) - (rooms[nextRoom].yPos + (rooms[nextRoom].ySize / 2)), 2) + pow((x) - (rooms[nextRoom].xPos + (rooms[nextRoom].xSize / 2)), 2));
+            if (shortestdistance > distance)
+            {
+                yNext = y + 1;
+                xNext = x;
+                shortestdistance = distance;
+            }
+            distance = sqrt(pow((y) - (rooms[nextRoom].yPos + (rooms[nextRoom].ySize / 2)), 2) + pow((x + 1) - (rooms[nextRoom].xPos + (rooms[nextRoom].xSize / 2)), 2));
+            if (shortestdistance > distance)
+            {
+                yNext = y;
+                xNext = x + 1;
+                shortestdistance = distance;
+            }
+
+            if (dungeon[yNext][xNext].type == ROCK)
+            {
+                dungeon[yNext][xNext].type = CORRIDOR;
+            }
+
+
+            if (yNext == rooms[nextRoom].yPos + (rooms[nextRoom].ySize / 2) && xNext == rooms[nextRoom].xPos + (rooms[nextRoom].xSize / 2))
+            {
+                break;
+            }
+
+            y = yNext;
+            x = xNext;
+        }
+    }
+
     printDungeon(dungeon);
 
     for (int i = 0; i < rows; i++)
