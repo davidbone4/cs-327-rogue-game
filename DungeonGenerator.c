@@ -4,8 +4,17 @@
 #include <time.h>
 #include <math.h>
 
-int rows = 21;
-int cols = 80;
+
+
+
+#define DUNGEON_X              80
+#define DUNGEON_Y              21
+#define MIN_ROOMS              6
+#define MAX_ROOMS              10
+#define ROOM_MIN_X             4
+#define ROOM_MIN_Y             3
+#define ROOM_MAX_X             12
+#define ROOM_MAX_Y             12
 
 typedef enum
 {
@@ -35,25 +44,25 @@ void printDungeon(cell **dungeon);
 int main(int argc, char const *argv[])
 {
 
-    cell **dungeon = (cell **)malloc(rows * sizeof(cell *));
+    cell **dungeon = (cell **)malloc(DUNGEON_Y * sizeof(cell *));
 
-    for (int i = 0; i < rows; i++)
+    for (int i = 0; i < DUNGEON_Y; i++)
     {
-        dungeon[i] = (cell *)malloc(cols * sizeof(cell));
+        dungeon[i] = (cell *)malloc(DUNGEON_X * sizeof(cell));
     }
 
     srand((unsigned)time(NULL));
 
-    int numRooms = (rand() % (10 - 6 + 1)) + 6;
+    int numRooms = (rand() % (MAX_ROOMS - MIN_ROOMS + 1)) + MIN_ROOMS;
 
     struct room rooms[numRooms];
 
     while (1)
     {
 
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < DUNGEON_Y; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < DUNGEON_X; j++)
             {
                 dungeon[i][j].type = ROCK;
                 dungeon[i][j].hardness = 255;
@@ -63,10 +72,10 @@ int main(int argc, char const *argv[])
         for (int i = 0; i < numRooms; i++)
         {
 
-            rooms[i].xSize = (rand() % (12 - 4 + 1)) + 4;
-            rooms[i].ySize = (rand() % (12 - 3 + 1)) + 3;
-            rooms[i].xPos = (rand() % ((79 - rooms[i].xSize) - 1 + 1)) + 1;
-            rooms[i].yPos = (rand() % ((20 - rooms[i].ySize) - 1 + 1)) + 1;
+            rooms[i].xSize = (rand() % (ROOM_MAX_X - ROOM_MIN_X + 1)) + ROOM_MIN_X;
+            rooms[i].ySize = (rand() % (ROOM_MAX_Y - ROOM_MIN_Y + 1)) + ROOM_MIN_Y;
+            rooms[i].xPos = (rand() % (((DUNGEON_X-1) - rooms[i].xSize) - 1 + 1)) + 1;
+            rooms[i].yPos = (rand() % (((DUNGEON_Y -1) - rooms[i].ySize) - 1 + 1)) + 1;
         }
 
         int spaceTest = 1;
@@ -192,7 +201,7 @@ int main(int argc, char const *argv[])
 
     printDungeon(dungeon);
 
-    for (int i = 0; i < rows; i++)
+    for (int i = 0; i < DUNGEON_Y; i++)
     {
         free(dungeon[i]);
     }
@@ -204,17 +213,17 @@ int main(int argc, char const *argv[])
 
 void printDungeon(cell **dungeon)
 {
-    for (int i = 0; i < cols + 2; i++)
+    for (int i = 0; i < DUNGEON_X + 2; i++)
     {
         printf("-");
     }
 
     printf("\n");
 
-    for (int i = 0; i < rows; i++)
+    for (int i = 0; i < DUNGEON_Y; i++)
     {
         printf("|");
-        for (int j = 0; j < cols; j++)
+        for (int j = 0; j < DUNGEON_X; j++)
         {
 
             if (dungeon[i][j].type == 0)
@@ -241,7 +250,7 @@ void printDungeon(cell **dungeon)
         printf("|\n");
     }
 
-    for (int i = 0; i < cols + 2; i++)
+    for (int i = 0; i < DUNGEON_X + 2; i++)
     {
         printf("-");
     }

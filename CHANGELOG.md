@@ -22,3 +22,5 @@
     => tested on pyrite server and got errors pertaining to the math.h library not being recognized. (this is the same problem mentioned in Piazza @94). I updated my make file to include -lm and it worked perfectly on the pyrite server.
     => update README.md and CHANGELOG.md
     => created zip and turned in assignment1.01
+2/16/2021
+    => added define statements to easily change dungeon parameters.
