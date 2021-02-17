@@ -22,7 +22,8 @@ typedef enum
     ROOM,
     CORRIDOR,
     UP,
-    DOWN
+    DOWN,
+    PLAYER
 } cellState;
 
 typedef struct Cells
@@ -41,7 +42,7 @@ typedef struct room
 
 void printDungeon(cell **dungeon);
 
-int main(int argc, char const *argv[])
+int mainbae(int argc, char const *argv[])
 {
 
     cell **dungeon = (cell **)malloc(DUNGEON_Y * sizeof(cell *));
@@ -245,6 +246,10 @@ void printDungeon(cell **dungeon)
             else if (dungeon[i][j].type == 4)
             {
                 printf(">");
+            }
+            else if (dungeon[i][j].type == 5)
+            {
+                printf("@");
             }
         }
         printf("|\n");
