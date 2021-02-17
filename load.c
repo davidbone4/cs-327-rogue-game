@@ -3,10 +3,43 @@
 #include <string.h>
 #include <machine/endian.h> //TODO
 
-#include "DungeonGenerator.c"
+
 #define _DEFAULT_SOURCE
 #define _BSD_SOURCE
 
+
+#define DUNGEON_X              80
+#define DUNGEON_Y              21
+#define MIN_ROOMS              6
+#define MAX_ROOMS              10
+#define ROOM_MIN_X             4
+#define ROOM_MIN_Y             3
+#define ROOM_MAX_X             12
+#define ROOM_MAX_Y             12
+
+typedef enum
+{
+    ROCK,
+    ROOM,
+    CORRIDOR,
+    UP,
+    DOWN,
+    PLAYER
+} cellState;
+
+typedef struct Cells
+{
+    cellState type;
+    int hardness;
+} cell;
+
+typedef struct room
+{
+    int xPos;
+    int yPos;
+    int xSize;
+    int ySize;
+} room;
 typedef struct pc
 {
     int8_t x, y;
@@ -65,4 +98,56 @@ int main(int argc, char const *argv[])
     //printf("%s\n", path);
 
     return 0;
+}
+
+
+void printDungeon(cell **dungeon)
+{
+    for (int i = 0; i < DUNGEON_X + 2; i++)
+    {
+        printf("-");
+    }
+
+    printf("\n");
+
+    for (int i = 0; i < DUNGEON_Y; i++)
+    {
+        printf("|");
+        for (int j = 0; j < DUNGEON_X; j++)
+        {
+
+            if (dungeon[i][j].type == 0)
+            {
+                printf(" ");
+            }
+            else if (dungeon[i][j].type == 1)
+            {
+                printf(".");
+            }
+            else if (dungeon[i][j].type == 2)
+            {
+                printf("#");
+            }
+            else if (dungeon[i][j].type == 3)
+            {
+                printf("<");
+            }
+            else if (dungeon[i][j].type == 4)
+            {
+                printf(">");
+            }
+            else if (dungeon[i][j].type == 5)
+            {
+                printf("@");
+            }
+        }
+        printf("|\n");
+    }
+
+    for (int i = 0; i < DUNGEON_X + 2; i++)
+    {
+        printf("-");
+    }
+
+    printf("\n");
 }
