@@ -20,7 +20,10 @@ USAGE:
     >Make
     > ./rlg327 <arguments>
 
-NOTE: I tested this program on Ubuntu and it was fully functional. On the pyrite server, I {Segmentation fault(core dumped)} error. I assume this is something to do with creating a .rlg327 folder in home. It is fully functional in Ubuntu
+NOTE: I tested this program on Ubuntu and it was fully functional. On the pyrite server, I {Segmentation fault(core dumped)} error. I assume this is something to do with creating a .rlg327 folder in home. It is fully functional in Ubuntu.
+
+ALSO NOTE: The terminal window must be AT LEAST 82 x 24 as I have a border around the dungeon output. (maybe I should delete the border...)
+
 
 Thank you!
 
