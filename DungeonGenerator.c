@@ -298,8 +298,8 @@ int load()
 
     FILE *fr;
 
-    fr = fopen(path, "r"); //TODO CHANGEEE THISS
-                                                                                                                                           //TODO CHANGE
+    fr = fopen(path, "r");
+
 
     if (fr == NULL)
     {
