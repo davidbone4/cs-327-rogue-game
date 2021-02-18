@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
-#include "endian.h"
+#include <endian.h>
 
 #define DUNGEON_X 80
 #define DUNGEON_Y 21
@@ -298,7 +298,7 @@ int load()
 
     FILE *fr;
 
-    fr = fopen("/Users/davidbone/Library/Mobile Documents/com~apple~CloudDocs/School/spring 2021/saved_dungeons/my_writing/dungeon", "r"); //TODO CHANGEEE THISS
+    fr = fopen(path, "r"); //TODO CHANGEEE THISS
                                                                                                                                            //TODO CHANGE
 
     if (fr == NULL)
@@ -469,7 +469,7 @@ int write()
 
     FILE *fw;
 
-    fw = fopen("/Users/davidbone/Library/Mobile Documents/com~apple~CloudDocs/School/spring 2021/saved_dungeons/my_writing/dungeon", "w");
+    fw = fopen(path, "w");
 
     char *semantic = "RLG327-S2021";
     fwrite(semantic, 1, 12, fw);
