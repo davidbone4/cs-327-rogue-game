@@ -24,3 +24,6 @@
     => created zip and turned in assignment1.01
 2/16/2021
     => added define statements to easily change dungeon parameters.
+    => created load.c which currently take a file at $HOME/.rlg327/dungeon and reads The first 3 parameters
+2/17/2022
+    => added corridor, room and player character load from file.

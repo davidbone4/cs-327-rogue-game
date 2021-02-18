@@ -3,3 +3,4 @@
 .vscode/
 turnins/
 .DS_Store
+*.h
