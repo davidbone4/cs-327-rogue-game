@@ -34,5 +34,6 @@
     => made dungeon a global variable
     => added command line argument support
 2/18/2022
+    => tested on Ubuntu
     => update README.md and CHANGELOG.md
     => created zip and turned in assignment1.02
