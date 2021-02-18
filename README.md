@@ -1,4 +1,33 @@
 # cs-327-rogue-game by David bone
+
+## Assignment 1.02
+
+This assignment adds file read and write capabilities to the file DungeonGenerator.c.
+
+It always reads or writes a file from the path
+
+    $HOME/.rlg327/dungeon
+
+I have included the following commandline arguments:
+
+    "--load" => loads the dungeon at said path and displays it
+    "--save" => saves dungeon to said path before exiting
+
+If now "--load" argument is set, it will generate a new dungeon using the algorithm I created last week. You are able to use both arguments in one line in any order. This will rewrite the loaded file every time it is ran.
+
+USAGE:
+
+    >Make
+    > ./rlg327 <arguments>
+
+NOTE: I tested this program on Ubuntu and it was fully functional. On the pyrite server, I {Segmentation fault(core dumped)} error. I assume this is something to do with creating a .rlg327 folder in home. It is fully functional in Ubuntu
+
+Thank you!
+
+
+
+
+
 ## Assignment 1.01
 
 This is the First assignment in the Rogue Game project! Booyah!
