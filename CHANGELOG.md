@@ -27,3 +27,9 @@
     => created load.c which currently take a file at $HOME/.rlg327/dungeon and reads The first 3 parameters
 2/17/2022
     => added corridor, room and player character load from file.
+    => added full load from file
+    => combined load.c and dungeongenerator.c into one file.
+    => changed dungeon to be a struct that included room information
+    => added write method to write to a file
+    => made dungeon a global variable
+    => added command line argument support

@@ -31,7 +31,7 @@ typedef enum
 typedef struct Cells
 {
     cellState type;
-    int hardness;
+    int8_t hardness;
 } cell;
 
 typedef struct room8bit
@@ -48,36 +48,57 @@ typedef struct dungeon
     room8bit rooms[MAX_ROOMS];
     int16_t num_rooms;
 } dungeon_type;
+
+dungeon_type dungeon;
 typedef struct positions
 {
     int8_t x, y;
 
 } position;
 
-void printDungeon(dungeon_type dungeon);
+void printDungeon();
 
-int generate(dungeon_type dungeon);
+int generate();
 
-int load(dungeon_type dungeon);
+int load();
+
+int write();
 
 int main(int argc, char const *argv[])
 {
+    int boolsave = 0;
+    int boolload = 0;
 
-    // cell **dungeon = (cell **)malloc(DUNGEON_Y * sizeof(cell *));
+    for (int i = 1; i < argc; i++)
+    {
+        if (strcmp(argv[i], "--save") == 0)
+        {
+            boolsave = 1;
+        }
+        else if (strcmp(argv[i], "--load") == 0)
+        {
+            boolload = 1;
+        }
+    }
 
-    // for (int i = 0; i < DUNGEON_Y; i++)
-    // {
-    //     dungeon[i] = (cell *)malloc(DUNGEON_X * sizeof(cell));
-    // }
+    if (boolload == 1)
+    {
+        load();
+    }
+    else
+    {
+        generate();
+    }
 
-    dungeon_type dungeon;
+    printDungeon();
 
-    // load(dungeon);
-
-    generate(dungeon);
+    if (boolsave == 1)
+    {
+        write();
+    }
 }
 
-int generate(dungeon_type dungeon)
+int generate()
 {
 
     srand((unsigned)time(NULL));
@@ -95,7 +116,7 @@ int generate(dungeon_type dungeon)
             for (int j = 0; j < DUNGEON_X; j++)
             {
                 dungeon.map[i][j].type = ROCK;
-                dungeon.map[i][j].hardness = 255;
+                dungeon.map[i][j].hardness = (int8_t)255;
             }
         }
 
@@ -261,12 +282,10 @@ int generate(dungeon_type dungeon)
         }
     }
 
-    printDungeon(dungeon);
-
     return 0;
 }
 
-int load(dungeon_type dungeon)
+int load()
 {
 
     char *home = getenv("HOME");
@@ -279,8 +298,8 @@ int load(dungeon_type dungeon)
 
     FILE *fr;
 
-    fr = fopen("/Users/davidbone/Library/Mobile Documents/com~apple~CloudDocs/School/spring 2021/saved_dungeons/00.rlg327", "r"); //TODO CHANGEEE THISS
-                                                                                                                                  //TODO CHANGE
+    fr = fopen("/Users/davidbone/Library/Mobile Documents/com~apple~CloudDocs/School/spring 2021/saved_dungeons/my_writing/dungeon", "r"); //TODO CHANGEEE THISS
+                                                                                                                                           //TODO CHANGE
 
     if (fr == NULL)
     {
@@ -299,7 +318,6 @@ int load(dungeon_type dungeon)
     int size;
     fread(&size, 4, 1, fr);
     size = be32toh(size);
-    printf("%d", size);
 
     position PC;
     fread(&PC.x, 1, 1, fr);
@@ -383,14 +401,12 @@ int load(dungeon_type dungeon)
 
     dungeon.map[PC.y][PC.x].type = PLAYER;
 
-    printDungeon(dungeon);
-
     fclose(fr);
 
     return 0;
 }
 
-int write(dungeon_type dungeon)
+int write()
 {
     int16_t numUp, numDown;
     numUp = 0;
@@ -409,7 +425,9 @@ int write(dungeon_type dungeon)
             else if (dungeon.map[i][j].type == DOWN)
             {
                 numDown++;
-            }else if (dungeon.map[i][j].type == PLAYER){
+            }
+            else if (dungeon.map[i][j].type == PLAYER)
+            {
                 PC.x = j;
                 PC.y = i;
             }
@@ -449,16 +467,66 @@ int write(dungeon_type dungeon)
 
     sprintf(path, "%s/%s/%s", home, game_dir, save_file);
 
+    FILE *fw;
 
-FILE *fr;
+    fw = fopen("/Users/davidbone/Library/Mobile Documents/com~apple~CloudDocs/School/spring 2021/saved_dungeons/my_writing/dungeon", "w");
 
-    fr = fopen("/Users/davidbone/Library/Mobile Documents/com~apple~CloudDocs/School/spring 2021/saved_dungeons/00.rlg327", "r");
+    char *semantic = "RLG327-S2021";
+    fwrite(semantic, 1, 12, fw);
 
+    int version = 0;
+    version = htobe32(version);
+    fwrite(&version, 4, 1, fw);
 
+    int size = 1708 + (dungeon.num_rooms * 4) + (numUp * 2) + (numDown * 2);
+    size = htobe32(size);
+    fwrite(&size, 4, 1, fw);
 
+    fwrite(&PC.x, 1, 1, fw);
+    fwrite(&PC.y, 1, 1, fw);
+
+    for (int i = 0; i < DUNGEON_Y; i++)
+    {
+        for (int j = 0; j < DUNGEON_X; j++)
+        {
+            fwrite(&dungeon.map[i][j].hardness, 1, 1, fw);
+        }
+    }
+
+    int16_t numrooms_output = dungeon.num_rooms;
+    numrooms_output = htobe16(numrooms_output);
+    fwrite(&numrooms_output, 2, 1, fw);
+
+    for (int i = 0; i < dungeon.num_rooms; i++)
+    {
+        fwrite(&dungeon.rooms[i].xPos, 1, 1, fw);
+        fwrite(&dungeon.rooms[i].yPos, 1, 1, fw);
+        fwrite(&dungeon.rooms[i].xSize, 1, 1, fw);
+        fwrite(&dungeon.rooms[i].ySize, 1, 1, fw);
+    }
+
+    int16_t numUp_output = htobe16(numUp);
+    fwrite(&numUp_output, 2, 1, fw);
+
+    for (int i = 0; i < numUp; i++)
+    {
+        fwrite(&Upstairs[i].x, 1, 1, fw);
+        fwrite(&Upstairs[i].y, 1, 1, fw);
+    }
+
+    int16_t numDown_output = htobe16(numDown);
+    fwrite(&numDown_output, 2, 1, fw);
+
+    for (int i = 0; i < numDown; i++)
+    {
+        fwrite(&Downstairs[i].x, 1, 1, fw);
+        fwrite(&Downstairs[i].y, 1, 1, fw);
+    }
+
+    fclose(fw);
     return 0;
 }
-void printDungeon(dungeon_type dungeon)
+void printDungeon()
 {
     for (int i = 0; i < DUNGEON_X + 2; i++)
     {
