@@ -72,8 +72,7 @@ int main(int argc, char const *argv[])
 
     dungeon_type dungeon;
 
-   // load(dungeon);
-
+    // load(dungeon);
 
     generate(dungeon);
 }
@@ -155,8 +154,6 @@ int generate(dungeon_type dungeon)
             break;
         }
     }
-
-
 
     for (int room = 0; room < numRooms; room++)
     {
@@ -246,16 +243,20 @@ int generate(dungeon_type dungeon)
         }
     }
 
-    for(int i = 0; i < DUNGEON_Y; i++){
+    for (int i = 0; i < DUNGEON_Y; i++)
+    {
         int out = 0;
-        for(int j = 0; j<DUNGEON_X; j++){
-            if(dungeon.map[i][j].type == ROOM){
+        for (int j = 0; j < DUNGEON_X; j++)
+        {
+            if (dungeon.map[i][j].type == ROOM)
+            {
                 dungeon.map[i][j].type = PLAYER;
                 out = 1;
                 break;
             }
         }
-        if(out == 1){
+        if (out == 1)
+        {
             break;
         }
     }
@@ -279,7 +280,7 @@ int load(dungeon_type dungeon)
     FILE *fr;
 
     fr = fopen("/Users/davidbone/Library/Mobile Documents/com~apple~CloudDocs/School/spring 2021/saved_dungeons/00.rlg327", "r"); //TODO CHANGEEE THISS
-                                                                                                                                                 //TODO CHANGE
+                                                                                                                                  //TODO CHANGE
 
     if (fr == NULL)
     {
@@ -298,7 +299,7 @@ int load(dungeon_type dungeon)
     int size;
     fread(&size, 4, 1, fr);
     size = be32toh(size);
-    printf("%d",size);
+    printf("%d", size);
 
     position PC;
     fread(&PC.x, 1, 1, fr);
@@ -391,7 +392,70 @@ int load(dungeon_type dungeon)
 
 int write(dungeon_type dungeon)
 {
-    int16_t numUp;
+    int16_t numUp, numDown;
+    numUp = 0;
+    numDown = 0;
+
+    position PC;
+
+    for (int i = 0; i < DUNGEON_Y; i++)
+    {
+        for (int j = 0; j < DUNGEON_X; j++)
+        {
+            if (dungeon.map[i][j].type == UP)
+            {
+                numUp++;
+            }
+            else if (dungeon.map[i][j].type == DOWN)
+            {
+                numDown++;
+            }else if (dungeon.map[i][j].type == PLAYER){
+                PC.x = j;
+                PC.y = i;
+            }
+        }
+    }
+
+    position Upstairs[numUp];
+    position Downstairs[numDown];
+
+    int upcounter = 0;
+    int downcounter = 0;
+
+    for (int i = 0; i < DUNGEON_Y; i++)
+    {
+        for (int j = 0; j < DUNGEON_X; j++)
+        {
+            if (dungeon.map[i][j].type == UP)
+            {
+                Upstairs[upcounter].x = j;
+                Upstairs[upcounter].y = i;
+                upcounter++;
+            }
+            else if (dungeon.map[i][j].type == DOWN)
+            {
+                Downstairs[downcounter].x = j;
+                Downstairs[downcounter].y = i;
+                downcounter++;
+            }
+        }
+    }
+
+    char *home = getenv("HOME");
+    char *game_dir = ".rlg327";
+    char *save_file = "dungeon";
+
+    char *path = malloc((strlen(home) + strlen(game_dir) + strlen(save_file) + 3) * sizeof(char));
+
+    sprintf(path, "%s/%s/%s", home, game_dir, save_file);
+
+
+FILE *fr;
+
+    fr = fopen("/Users/davidbone/Library/Mobile Documents/com~apple~CloudDocs/School/spring 2021/saved_dungeons/00.rlg327", "r");
+
+
+
     return 0;
 }
 void printDungeon(dungeon_type dungeon)
