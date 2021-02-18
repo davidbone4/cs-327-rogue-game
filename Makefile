@@ -6,8 +6,8 @@ CXX = g++
 ECHO = echo
 RM = rm -f
 
-load: load.c
-	gcc load.c -o load.out
+build:
+	gcc DungeonGenerator.c -o rlg327 -lm
 
-# DungeonGenerator: DungeonGenerator.c
-# 	gcc DungeonGenerator.c -o generator.out -lm
+clean:
+	rm rlg327
