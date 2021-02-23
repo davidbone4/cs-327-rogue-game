@@ -116,7 +116,14 @@ int generate()
             for (int j = 0; j < DUNGEON_X; j++)
             {
                 dungeon.map[i][j].type = ROCK;
-                dungeon.map[i][j].hardness = (int8_t)255;
+                if (i == 0 || i == DUNGEON_Y - 1 || j == 0 || j == DUNGEON_X - 1)
+                {
+                    dungeon.map[i][j].hardness = (int8_t)255;
+                }
+                else
+                {
+                    dungeon.map[i][j].hardness = (int8_t)((rand() % 254) + 1);
+                }
             }
         }
 
