@@ -5,6 +5,8 @@
 #include <math.h>
 #include "endian.h"
 
+#include "pathfinding.c"
+
 #define DUNGEON_X 80
 #define DUNGEON_Y 21
 #define MIN_ROOMS 6
@@ -91,6 +93,10 @@ int main(int argc, char const *argv[])
     }
 
     printDungeon();
+
+    dungeon_type *d;
+    d = &dungeon;
+    nontunnel_path_finder(d);
 
     if (boolsave == 1)
     {
