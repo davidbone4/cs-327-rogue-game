@@ -3,6 +3,6 @@
 .vscode/
 turnins/
 .DS_Store
-*.h
+endian.h
 DungeonGenerator
 rlg327
