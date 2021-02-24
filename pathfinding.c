@@ -5,43 +5,27 @@
 #include <time.h>
 #include <math.h>
 
-#include "dungeon.h"
-#include "heap.h"
+#include "dungeondefinitions.h"
 
 /* This code is based of of Professor Sheaffer's code, but you could probably already tell that...*/
 
-typedef struct corridor_path
-{
-    heap_node_t *hn;
-    uint8_t x, y;
-    int32_t cost;
-} path_data;
-
-typedef enum dim
-{
-    dim_x,
-    dim_y,
-    num_dims
-} dim_t;
-
-
-
+static int cellweight(int hardness);
 static int32_t path_cmp(const void *key, const void *with);
 
-static void nontunnel_path_finder(dungeon_type *d);
+void nontunnel_path_finder(dungeon_type *d);
 
-
-void print_distance_map(path_data **path);
-
+static void print_distance_map(path_data path[DUNGEON_Y][DUNGEON_X], int pcY, int pcX);
 
 static int32_t path_cmp(const void *key, const void *with)
 {
     return ((path_data *)key)->cost - ((path_data *)with)->cost;
 }
 
-static void nontunnel_path_finder(dungeon_type *d)
+void nontunnel_path_finder(dungeon_type *d)
 {
-    static path_data path[DUNGEON_Y][DUNGEON_X], *p;
+
+    dungeon_type dungeon = *d;
+    path_data path[DUNGEON_Y][DUNGEON_X], *p;
     static uint32_t initialized = 0;
     heap_t h;
     uint32_t x, y;
@@ -66,7 +50,7 @@ static void nontunnel_path_finder(dungeon_type *d)
         for (x = 0; x < DUNGEON_X; x++)
         {
             path[y][x].cost = INT_MAX;
-            if (&d->map[y][x].type == PLAYER)
+            if (dungeon.map[y][x].type == PLAYER)
             {
                 pcY = y;
                 pcX = x;
@@ -74,7 +58,9 @@ static void nontunnel_path_finder(dungeon_type *d)
         }
     }
 
-    path[y][x].cost = 0;
+    path[pcY][pcX].cost = 0;
+
+    printf("\n");
 
     heap_init(&h, path_cmp, NULL);
 
@@ -82,7 +68,7 @@ static void nontunnel_path_finder(dungeon_type *d)
     {
         for (x = 0; x < DUNGEON_X; x++)
         {
-            if (&d->map[y][x].hardness == 0)
+            if (dungeon.map[y][x].hardness == 0)
             {
                 path[y][x].hn = heap_insert(&h, &path[y][x]);
             }
@@ -106,28 +92,47 @@ static void nontunnel_path_finder(dungeon_type *d)
                     continue;
                 }
 
-                if ((path[i][j].hn) && (path[i][j].cost > p->cost + &d->map[p->y][p->x].hardness))
+                if ((path[i][j].hn) && (path[i][j].cost > p->cost + cellweight(dungeon.map[p->y][p->x].hardness)))
                 {
-                    path[i][j].cost = p->cost + &d->map[p->y][p->x].hardness;
+                    path[i][j].cost = p->cost + cellweight(dungeon.map[p->y][p->x].hardness);
                     heap_decrease_key_no_replace(&h, path[i][j].hn);
                 }
             }
         }
     }
 
-    print_distance_map(path);
+    print_distance_map(path, pcY, pcX);
 }
 
-void print_distance_map(path_data **path)
+static int cellweight(int hardness)
+{
+    if (hardness == 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return 1 + (hardness / 85);
+    }
+}
+
+static void print_distance_map(path_data path[DUNGEON_Y][DUNGEON_X], int pcY, int pcX)
 {
 
     for (int i = 0; i < DUNGEON_Y; i++)
     {
         for (int j = 0; j < DUNGEON_X; j++)
         {
-            if(path[i][j].cost != INT_MAX){
+            if (i == pcY && j == pcX)
+            {
+                printf("@");
+            }
+            else if (path[i][j].cost != INT_MAX)
+            {
                 printf("%d", path[i][j].cost % 10);
-            }else{
+            }
+            else
+            {
                 printf(" ");
             }
         }

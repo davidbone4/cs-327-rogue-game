@@ -5,58 +5,9 @@
 #include <math.h>
 #include "endian.h"
 
-#include "pathfinding.c"
-
-#define DUNGEON_X 80
-#define DUNGEON_Y 21
-#define MIN_ROOMS 6
-#define MAX_ROOMS 10
-#define ROOM_MIN_X 4
-#define ROOM_MIN_Y 3
-#define ROOM_MAX_X 12
-#define ROOM_MAX_Y 12
-#define MIN_UP 1
-#define MAX_UP 3
-#define MIN_DOWN 1
-#define MAX_DOWN 3
-
-typedef enum
-{
-    ROCK,
-    ROOM,
-    CORRIDOR,
-    UP,
-    DOWN,
-    PLAYER
-} cellState;
-
-typedef struct Cells
-{
-    cellState type;
-    int8_t hardness;
-} cell;
-
-typedef struct room8bit
-{
-    int8_t xPos;
-    int8_t yPos;
-    int8_t xSize;
-    int8_t ySize;
-} room8bit;
-
-typedef struct dungeon
-{
-    cell map[DUNGEON_Y][DUNGEON_X];
-    room8bit rooms[MAX_ROOMS];
-    int16_t num_rooms;
-} dungeon_type;
+#include "dungeondefinitions.h"
 
 dungeon_type dungeon;
-typedef struct positions
-{
-    int8_t x, y;
-
-} position;
 
 void printDungeon();
 
@@ -277,24 +228,16 @@ int generate()
         }
     }
 
-    for (int i = 0; i < DUNGEON_Y; i++)
+    while (1)
     {
-        int out = 0;
-        for (int j = 0; j < DUNGEON_X; j++)
+        int pcY = (rand() % (DUNGEON_Y - 1)) + 1;
+        int pcX = (rand() % (DUNGEON_X - 1)) + 1;
+        if (dungeon.map[pcY][pcX].type == ROOM)
         {
-            if (dungeon.map[i][j].type == ROOM)
-            {
-                dungeon.map[i][j].type = PLAYER;
-                out = 1;
-                break;
-            }
-        }
-        if (out == 1)
-        {
+            dungeon.map[pcY][pcX].type = PLAYER;
             break;
         }
     }
-
     return 0;
 }
 
