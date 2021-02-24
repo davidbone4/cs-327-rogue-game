@@ -27,22 +27,22 @@ typedef enum
 typedef struct Cells
 {
     cellState type;
-    int8_t hardness;
+    uint8_t hardness;
 } cell;
 
 typedef struct room8bit
 {
-    int8_t xPos;
-    int8_t yPos;
-    int8_t xSize;
-    int8_t ySize;
+    uint8_t xPos;
+    uint8_t yPos;
+    uint8_t xSize;
+    uint8_t ySize;
 } room8bit;
 
 typedef struct dungeon
 {
     cell map[DUNGEON_Y][DUNGEON_X];
     room8bit rooms[MAX_ROOMS];
-    int16_t num_rooms;
+    uint16_t num_rooms;
 } dungeon_type;
 
 
@@ -51,14 +51,15 @@ typedef struct corridor_path
 {
     heap_node_t *hn;
     uint8_t x, y;
-    int32_t cost;
+    uint32_t cost;
 } path_data;
 
 typedef struct positions
 {
-    int8_t x, y;
+    uint8_t x, y;
 
 } position;
 
 
 void nontunnel_path_finder(dungeon_type *d);
+void tunnel_path_finder(dungeon_type *d);

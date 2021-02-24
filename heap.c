@@ -340,7 +340,7 @@ int heap_decrease_key_no_replace(heap_t *h, heap_node_t *n)
 
 #ifdef TESTING
 
-int32_t compare(const void *key, const void *with)
+uint32_t compare(const void *key, const void *with)
 {
   return *((int *) key) - *((int *) with);
 }

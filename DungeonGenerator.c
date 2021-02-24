@@ -48,6 +48,7 @@ int main(int argc, char const *argv[])
     dungeon_type *d;
     d = &dungeon;
     nontunnel_path_finder(d);
+    tunnel_path_finder(d);
 
     if (boolsave == 1)
     {
@@ -75,11 +76,11 @@ int generate()
                 dungeon.map[i][j].type = ROCK;
                 if (i == 0 || i == DUNGEON_Y - 1 || j == 0 || j == DUNGEON_X - 1)
                 {
-                    dungeon.map[i][j].hardness = (int8_t)255;
+                    dungeon.map[i][j].hardness = (uint8_t)255;
                 }
                 else
                 {
-                    dungeon.map[i][j].hardness = (int8_t)((rand() % 254) + 1);
+                    dungeon.map[i][j].hardness = (uint8_t)((rand() % 254) + 1);
                 }
             }
         }
@@ -283,7 +284,7 @@ int load()
     {
         for (int j = 0; j < DUNGEON_X; j++)
         {
-            int8_t givenHardness;
+            uint8_t givenHardness;
             fread(&givenHardness, 1, 1, fr);
             dungeon.map[i][j].hardness = givenHardness;
             if (givenHardness == 0)
@@ -329,7 +330,7 @@ int load()
         }
     }
 
-    int16_t numUpStairs;
+    uint16_t numUpStairs;
     fread(&numUpStairs, 2, 1, fr);
     numUpStairs = be16toh(numUpStairs);
 
@@ -342,7 +343,7 @@ int load()
         dungeon.map[upstairs.y][upstairs.x].type = UP;
     }
 
-    int16_t numDownStairs;
+    uint16_t numDownStairs;
     fread(&numDownStairs, 2, 1, fr);
     numDownStairs = be16toh(numDownStairs);
 
@@ -364,7 +365,7 @@ int load()
 
 int write()
 {
-    int16_t numUp, numDown;
+    uint16_t numUp, numDown;
     numUp = 0;
     numDown = 0;
 
@@ -449,7 +450,7 @@ int write()
         }
     }
 
-    int16_t numrooms_output = dungeon.num_rooms;
+    uint16_t numrooms_output = dungeon.num_rooms;
     numrooms_output = htobe16(numrooms_output);
     fwrite(&numrooms_output, 2, 1, fw);
 
@@ -461,7 +462,7 @@ int write()
         fwrite(&dungeon.rooms[i].ySize, 1, 1, fw);
     }
 
-    int16_t numUp_output = htobe16(numUp);
+    uint16_t numUp_output = htobe16(numUp);
     fwrite(&numUp_output, 2, 1, fw);
 
     for (int i = 0; i < numUp; i++)
@@ -470,7 +471,7 @@ int write()
         fwrite(&Upstairs[i].y, 1, 1, fw);
     }
 
-    int16_t numDown_output = htobe16(numDown);
+    uint16_t numDown_output = htobe16(numDown);
     fwrite(&numDown_output, 2, 1, fw);
 
     for (int i = 0; i < numDown; i++)
