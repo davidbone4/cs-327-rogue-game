@@ -37,3 +37,14 @@
     => tested on Ubuntu
     => update README.md and CHANGELOG.md
     => created zip and turned in assignment1.02
+2/22/2022
+    => copied professor Sheaffer's algorithm to base my pathfinder logic.
+    => created new file pathfinding.c
+2/23/2022
+    => created .h file to store all definitions for all files
+    => changed hardness and other vars from signed to unsigned
+    => correctly added non-tunneling path generation
+    => correctly added tunneling path generation
+    => tested on Ubuntu
+2/24/2022
+    => update README.md and turned in assignment1.03

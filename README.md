@@ -1,5 +1,20 @@
 # cs-327-rogue-game by David bone
 
+## Assignment 1.03
+
+This assignment adds distance map generation for both tunneling and non-tunneling. Both are automatically output when the program is ran.
+
+All argument logic still applies.
+
+USAGE:
+
+    >make
+    > ./rlg327 <arguments>
+
+NOTE: tested on Ubuntu
+
+Thank you!
+
 ## Assignment 1.02
 
 This assignment adds file read and write capabilities to the file DungeonGenerator.c.
