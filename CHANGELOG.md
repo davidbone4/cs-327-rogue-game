@@ -48,3 +48,9 @@
     => tested on Ubuntu
 2/24/2022
     => update README.md and turned in assignment1.03
+3/2/2022
+    => Created a monster struct and used an array within dungeon to store them
+    => created monster.c and init_monsters method.
+    => wrote logic to randomly determine type of monster and print hex numbers
+    => updated path finding methods to take in a starting position
+    => began fixing monsters and PC being stored in the grid.
