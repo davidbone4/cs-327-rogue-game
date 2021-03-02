@@ -12,8 +12,8 @@
 static int cellweight(int hardness);
 static int32_t path_cmp(const void *key, const void *with);
 
-void nontunnel_path_finder(dungeon_type *d);
-void tunnel_path_finder(dungeon_type *d);
+path_data ** nontunnel_path_finder(dungeon_type *d, int ystart, int xstart);
+path_data ** tunnel_path_finder(dungeon_type *d, int ystart, int xstart);
 
 static void print_distance_map(path_data path[DUNGEON_Y][DUNGEON_X], int pcY, int pcX);
 
@@ -22,7 +22,7 @@ static int32_t path_cmp(const void *key, const void *with)
     return ((path_data *)key)->cost - ((path_data *)with)->cost;
 }
 
-void nontunnel_path_finder(dungeon_type *d)
+path_data ** nontunnel_path_finder(dungeon_type *d, int ystart, int xstart)
 {
 
     dungeon_type dungeon = *d;
@@ -44,22 +44,9 @@ void nontunnel_path_finder(dungeon_type *d)
         initialized = 1;
     }
 
-    int pcY, pcX;
 
-    for (y = 0; y < DUNGEON_Y; y++)
-    {
-        for (x = 0; x < DUNGEON_X; x++)
-        {
-            path[y][x].cost = INT_MAX;
-            if (dungeon.map[y][x].type == PLAYER)
-            {
-                pcY = y;
-                pcX = x;
-            }
-        }
-    }
 
-    path[pcY][pcX].cost = 0;
+    path[ystart][xstart].cost = 0;
 
     printf("\n");
 
@@ -102,10 +89,11 @@ void nontunnel_path_finder(dungeon_type *d)
         }
     }
 
-    print_distance_map(path, pcY, pcX);
+    // print_distance_map(path, pcY, pcX);
+    return path;
 }
 
-void tunnel_path_finder(dungeon_type *d)
+path_data** tunnel_path_finder(dungeon_type *d, int ystart, int xstart)
 {
 
     dungeon_type dungeon = *d;
@@ -127,22 +115,7 @@ void tunnel_path_finder(dungeon_type *d)
         initialized = 1;
     }
 
-    int pcY, pcX;
-
-    for (y = 0; y < DUNGEON_Y; y++)
-    {
-        for (x = 0; x < DUNGEON_X; x++)
-        {
-            path[y][x].cost = INT_MAX;
-            if (dungeon.map[y][x].type == PLAYER)
-            {
-                pcY = y;
-                pcX = x;
-            }
-        }
-    }
-
-    path[pcY][pcX].cost = 0;
+    path[ystart][xstart].cost = 0;
 
     printf("\n");
 
@@ -185,7 +158,8 @@ void tunnel_path_finder(dungeon_type *d)
         }
     }
 
-    print_distance_map(path, pcY, pcX);
+    // print_distance_map(path, pcY, pcX);
+    return path;
 }
 
 static int cellweight(int hardness)

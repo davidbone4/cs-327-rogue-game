@@ -38,12 +38,36 @@ typedef struct room8bit
     uint8_t ySize;
 } room8bit;
 
+
+typedef struct monster
+{
+    heap_node_t *hn;
+    int speed;
+    char to_string;
+    char* type;
+    uint8_t x,y;
+    int nextturn;
+    int sequencenumber;
+}monster;
+
+typedef struct player
+{
+    heap_node_t *hn;
+    int speed;
+    uint8_t x,y;
+    int nextturn;
+    int sequencenumber;
+}player;
 typedef struct dungeon
 {
     cell map[DUNGEON_Y][DUNGEON_X];
     room8bit rooms[MAX_ROOMS];
     uint16_t num_rooms;
+    monster * monsters;
+    int num_monsters;
+    player PC;
 } dungeon_type;
+
 
 
 
@@ -60,13 +84,7 @@ typedef struct positions
 
 } position;
 
-typedef struct monster
-{
-    int speed;
-    char to_string;
-    char* type;
-    uint8_t x,y;
-}monster;
+
 
 typedef enum
 {
@@ -75,7 +93,6 @@ typedef enum
     TELEPATHY,
     INTELLIGENCE
 }behavior;
-
-monster * init_monsters(dungeon_type *d, int numMonsters);
-void nontunnel_path_finder(dungeon_type *d);
-void tunnel_path_finder(dungeon_type *d);
+void init_monsters(dungeon_type *d, int numMonsters);
+path_data ** nontunnel_path_finder(dungeon_type *d, int ystart, int xstart);
+path_data ** tunnel_path_finder(dungeon_type *d, int ystart, int xstart);

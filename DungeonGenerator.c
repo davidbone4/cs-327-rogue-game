@@ -45,17 +45,17 @@ int main(int argc, char const *argv[])
 
     printDungeon();
 
-    dungeon_type *d;
-    d = &dungeon;
-
-    init_monsters(d, 10);
-    // nontunnel_path_finder(d);
-    // tunnel_path_finder(d);
-
     if (boolsave == 1)
     {
         write();
     }
+    dungeon_type *d;
+    d = &dungeon;
+
+    init_monsters(d, 10);
+    printDungeon();
+    // nontunnel_path_finder(d);
+    // tunnel_path_finder(d);
 }
 
 int generate()
@@ -238,6 +238,8 @@ int generate()
         if (dungeon.map[pcY][pcX].type == ROOM)
         {
             dungeon.map[pcY][pcX].type = PLAYER;
+            dungeon.PC.y = pcY;
+            dungeon.PC.x = pcX;
             break;
         }
     }
@@ -499,28 +501,39 @@ void printDungeon()
         printf("|");
         for (int j = 0; j < DUNGEON_X; j++)
         {
-
-            if (dungeon.map[i][j].type == 0)
+            int out = 0;
+            for (int k = 0; k < dungeon.num_monsters; k++)
+            {
+                if (dungeon.monsters[k].y == i && dungeon.monsters[k].x == j)
+                {
+                    printf("%c", dungeon.monsters[k].to_string);
+                    out = 1;
+                    break;
+                }
+                if(out) break;
+            }
+            if(out) break;
+            if (dungeon.map[i][j].type == ROCK)
             {
                 printf(" ");
             }
-            else if (dungeon.map[i][j].type == 1)
+            else if (dungeon.map[i][j].type == ROOM)
             {
                 printf(".");
             }
-            else if (dungeon.map[i][j].type == 2)
+            else if (dungeon.map[i][j].type == CORRIDOR)
             {
                 printf("#");
             }
-            else if (dungeon.map[i][j].type == 3)
+            else if (dungeon.map[i][j].type == UP)
             {
                 printf("<");
             }
-            else if (dungeon.map[i][j].type == 4)
+            else if (dungeon.map[i][j].type == DOWN)
             {
                 printf(">");
             }
-            else if (dungeon.map[i][j].type == 5)
+            else if (dungeon.map[i][j].type == PLAYER)
             {
                 printf("@");
             }

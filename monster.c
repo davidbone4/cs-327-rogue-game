@@ -7,37 +7,91 @@
 
 #include "dungeondefinitions.h"
 
+char *hextobinary(int num);
 
-char* hextobinary(int num);
-
-monster* init_monsters(dungeon_type *d, int numMonsters)
+void init_monsters(dungeon_type *d, int numMonsters)
 {
 
     srand((unsigned)time(NULL));
 
-    monster *monsters = malloc(numMonsters* sizeof(monster));
+    monster *monsters = malloc(numMonsters * sizeof(monster));
 
     for (int i = 0; i < numMonsters; i++)
     {
         monsters[i].speed = (rand() % 16) + 5;
-        int type = rand() %  16;
+        int type = rand() % 16;
         monsters[i].type = hextobinary(type);
 
-        if(type < 10){
-            monsters[i].to_string = (char) type;
-        }else{
+        if (type < 10)
+        {
+            char numeric[] = "0123456789";
+            monsters[i].to_string = numeric[type];
+        }
+        else
+        {
             char alpha[] = "abcdef";
             monsters[i].to_string = alpha[type - 10];
         }
 
+        while (1)
+        {
+            int Y = (rand() % (DUNGEON_Y - 1)) + 1;
+            int X = (rand() % (DUNGEON_X - 1)) + 1;
+            if (d->map[Y][X].type == ROOM || d->map[Y][X].type == CORRIDOR)
+            {
+                monsters[i].y = Y;
+                monsters[i].x = X;
+                break;
+            }
+        }
+    }
+
+    d->monsters = monsters;
+    d->num_monsters = numMonsters;
+}
+
+
+void movemonsternontunneling(dungeon_type *d, monster m){
+    uint8_t nextY, nextX;
+
+    if(m.type[INTELLIGENCE] && m.type[TELEPATHY]){
+        path_data path[DUNGEON_Y][DUNGEON_X] = tunnel_path_finder(d, d->PC.y, d->PC.x);
+
+        for (int y = m.y - 1; y <= m.y + 1; y++)
+        {
+            for (int x = m.x - 1; x <= m.x + 1; x++)
+            {
+                if (y == m.y && x == m.x)
+                {
+                    continue;
+                }
+                if(path[y][x].cost < path[m.y][m.x].cost){
+
+                    nextY = y;
+                    nextX = x;
+                }
+
+            }
+        }
     }
 
 
 
-    return monsters;
+
+    if(m.type[ERRATIC]){
+        int chance = rand()%2;
+
+        if(chance){
+
+        }
+    }
+
+
+
 }
 
-char* hextobinary(int num){
+char *hextobinary(int num)
+{
 
     switch (num)
     {
@@ -72,7 +126,7 @@ char* hextobinary(int num){
     case 7:
         return "0111";
         break;
-     case 8:
+    case 8:
         return "1000";
         break;
 
@@ -88,7 +142,7 @@ char* hextobinary(int num){
         return "1011";
         break;
 
-     case 12:
+    case 12:
         return "1100";
         break;
 
@@ -103,7 +157,6 @@ char* hextobinary(int num){
     case 15:
         return "1111";
         break;
-
     }
     return "0000";
 }
