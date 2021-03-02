@@ -47,8 +47,10 @@ int main(int argc, char const *argv[])
 
     dungeon_type *d;
     d = &dungeon;
-    nontunnel_path_finder(d);
-    tunnel_path_finder(d);
+
+    init_monsters(d, 10);
+    // nontunnel_path_finder(d);
+    // tunnel_path_finder(d);
 
     if (boolsave == 1)
     {

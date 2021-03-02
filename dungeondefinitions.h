@@ -60,6 +60,22 @@ typedef struct positions
 
 } position;
 
+typedef struct monster
+{
+    int speed;
+    char to_string;
+    char* type;
+    uint8_t x,y;
+}monster;
 
+typedef enum
+{
+    ERRATIC,
+    TUNNELING,
+    TELEPATHY,
+    INTELLIGENCE
+}behavior;
+
+monster * init_monsters(dungeon_type *d, int numMonsters);
 void nontunnel_path_finder(dungeon_type *d);
 void tunnel_path_finder(dungeon_type *d);
