@@ -9,6 +9,10 @@
 
 char *hextobinary(int num);
 
+int islineofsight(dungeon_type *d, monster m, position pc);
+
+void movemonsternontunneling(dungeon_type *d, monster m);
+
 void init_monsters(dungeon_type *d, int numMonsters)
 {
 
@@ -21,6 +25,11 @@ void init_monsters(dungeon_type *d, int numMonsters)
         monsters[i].speed = (rand() % 16) + 5;
         int type = rand() % 16;
         monsters[i].type = hextobinary(type);
+        monsters[i].alive = 1;
+        monsters[i].sequencenumber = i + 1;
+        monsters[i].nextturn = 0;
+        monsters[i].memory.y = 0;
+        monsters[i].memory.x = 0;
 
         if (type < 10)
         {
@@ -50,12 +59,14 @@ void init_monsters(dungeon_type *d, int numMonsters)
     d->num_monsters = numMonsters;
 }
 
+void movemonsternontunneling(dungeon_type *d, monster m)
+{
+    uint8_t nextY = m.y;
+    uint8_t nextX = m.x;
 
-void movemonsternontunneling(dungeon_type *d, monster m){
-    uint8_t nextY, nextX;
-
-    if(m.type[INTELLIGENCE] && m.type[TELEPATHY]){
-        path_data path[DUNGEON_Y][DUNGEON_X] = tunnel_path_finder(d, d->PC.y, d->PC.x);
+    if (m.type[INTELLIGENCE] && m.type[TELEPATHY])
+    {
+        int **path = tunnel_path_finder(d, d->PC.pos.y, d->PC.pos.x);
 
         for (int y = m.y - 1; y <= m.y + 1; y++)
         {
@@ -65,26 +76,105 @@ void movemonsternontunneling(dungeon_type *d, monster m){
                 {
                     continue;
                 }
-                if(path[y][x].cost < path[m.y][m.x].cost){
+                if (path[y][x] < path[m.y][m.x])
+                {
 
                     nextY = y;
                     nextX = x;
                 }
+            }
+        }
+    }
+    else if (m.type[TELEPATHY]){
 
+    }
+    else if(m.type[INTELLIGENCE]){
+
+    }
+    else
+    {
+
+        if (islineofsight(d, m, d->PC.pos))
+        {
+            m.memory.y = d->PC.pos.y;
+            m.memory.x = d->PC.pos.x;
+        }
+
+        if (m.memory.y && m.memory.y)
+        {
+
+            double shortestdistance = sqrt(pow(m.y - m.memory.y, 2) + pow(m.x - m.memory.x, 2));
+            double distance;
+
+            int shortestY = m.y;
+            int shortestX = m.x;
+
+            for (int i = m.y - 1; i < m.y + 2; i++)
+            {
+                for (int j = m.x - 1; j < m.x + 2; j++)
+                {
+                    if (i == m.y && j == m.x)
+                    {
+                        continue;
+                    }
+
+                    distance = sqrt(pow((i)-m.memory.y, 2) + pow((j)-m.memory.x, 2));
+                    if (shortestdistance > distance)
+                    {
+                        shortestY = i;
+                        shortestX = j;
+                        shortestdistance = distance;
+                    }
+                }
+            }
+
+
+            if(d->map[shortestY][shortestX].type == ROOM ||d->map[shortestY][shortestX].type == CORRIDOR){
+                nextY = shortestY;
+                nextX = shortestX;
+            }
+
+
+
+        }
+    }
+
+    if (m.type[ERRATIC])
+    {
+        int chance = rand() % 2;
+
+        if (chance)
+        {
+            while (1)
+            {
+                int randY, randX;
+                randY = (rand() % 3) + (m.y - 1);
+                randX = (rand() % 3) + (m.x - 1);
+                if (randY != m.y && randX != m.x)
+                {
+                    if (d->map[randY][randX].type == ROOM || d->map[randY][randX].type == CORRIDOR)
+                    {
+                        nextY = randY;
+                        nextX = randX;
+                        break;
+                    }
+                }
             }
         }
     }
 
-
-
-
-    if(m.type[ERRATIC]){
-        int chance = rand()%2;
-
-        if(chance){
-
+    for (int i = 0; i < d->num_monsters; i++)
+    {
+        if (d->monsters[i].y == nextY && d->monsters[i].x == nextX)
+        {
+            d->monsters[i].alive = 0;
+        }
+        if(d->monsters[i].y == m.y && d->monsters[i].x == m.x){
+            d->monsters[i].y = nextY;
+            d->monsters[i].x = nextX;
         }
     }
+
 
 
 
@@ -159,4 +249,53 @@ char *hextobinary(int num)
         break;
     }
     return "0000";
+}
+
+int islineofsight(dungeon_type *d, monster m, position pc)
+{
+
+    int y = m.y;
+    int x = m.x;
+
+    while (1)
+    {
+        double shortestdistance = sqrt(pow(y - pc.y, 2) + pow(x - pc.x, 2));
+        double distance;
+
+        int yNext = y;
+        int xNext = x;
+
+        for (int i = y - 1; i < y + 2; i++)
+        {
+            for (int j = x - 1; j < x + 2; j++)
+            {
+                if (i == y && j == x)
+                {
+                    continue;
+                }
+
+                distance = sqrt(pow((i)-pc.y, 2) + pow((j)-pc.x, 2));
+                if (shortestdistance > distance)
+                {
+                    yNext = i;
+                    xNext = j;
+                    shortestdistance = distance;
+                }
+            }
+        }
+
+        if (d->map[yNext][xNext].type == ROCK)
+        {
+            return 0;
+        }
+
+        if (yNext == pc.y && xNext == pc.y)
+        {
+            break;
+        }
+
+        y = yNext;
+        x = xNext;
+    }
+    return 1;
 }

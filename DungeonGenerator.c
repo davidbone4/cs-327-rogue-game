@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
+#include <unistd.h>
 #include "endian.h"
 
 #include "dungeondefinitions.h"
@@ -15,7 +16,7 @@ int generate();
 
 int load();
 
-int write();
+int writetodisk();
 
 int main(int argc, char const *argv[])
 {
@@ -47,12 +48,22 @@ int main(int argc, char const *argv[])
 
     if (boolsave == 1)
     {
-        write();
+        writetodisk();
     }
     dungeon_type *d;
     d = &dungeon;
 
     init_monsters(d, 10);
+    usleep(1000000);
+    printDungeon();
+    for(int i = 0; i < dungeon.num_monsters; i ++){
+
+        if(!dungeon.monsters[i].type[TUNNELING]){
+
+            movemonsternontunneling(d,dungeon.monsters[i]);
+        }
+    }
+    usleep(1000000);
     printDungeon();
     // nontunnel_path_finder(d);
     // tunnel_path_finder(d);
@@ -237,9 +248,8 @@ int generate()
         int pcX = (rand() % (DUNGEON_X - 1)) + 1;
         if (dungeon.map[pcY][pcX].type == ROOM)
         {
-            dungeon.map[pcY][pcX].type = PLAYER;
-            dungeon.PC.y = pcY;
-            dungeon.PC.x = pcX;
+            dungeon.PC.pos.y = pcY;
+            dungeon.PC.pos.x = pcX;
             break;
         }
     }
@@ -283,6 +293,9 @@ int load()
     position PC;
     fread(&PC.x, 1, 1, fr);
     fread(&PC.y, 1, 1, fr);
+
+    dungeon.PC.pos.y = PC.y;
+    dungeon.PC.pos.x = PC.x;
 
     for (int i = 0; i < DUNGEON_Y; i++)
     {
@@ -360,14 +373,12 @@ int load()
         dungeon.map[downstairs.y][downstairs.x].type = DOWN;
     }
 
-    dungeon.map[PC.y][PC.x].type = PLAYER;
-
     fclose(fr);
 
     return 0;
 }
 
-int write()
+int writetodisk()
 {
     uint16_t numUp, numDown;
     numUp = 0;
@@ -386,11 +397,6 @@ int write()
             else if (dungeon.map[i][j].type == DOWN)
             {
                 numDown++;
-            }
-            else if (dungeon.map[i][j].type == PLAYER)
-            {
-                PC.x = j;
-                PC.y = i;
             }
         }
     }
@@ -510,10 +516,14 @@ void printDungeon()
                     out = 1;
                     break;
                 }
-                if(out) break;
+
             }
-            if(out) break;
-            if (dungeon.map[i][j].type == ROCK)
+            if(out) continue;
+            if (dungeon.PC.pos.y == i && dungeon.PC.pos.x == j)
+            {
+                printf("@");
+            }
+            else if (dungeon.map[i][j].type == ROCK)
             {
                 printf(" ");
             }
@@ -532,10 +542,6 @@ void printDungeon()
             else if (dungeon.map[i][j].type == DOWN)
             {
                 printf(">");
-            }
-            else if (dungeon.map[i][j].type == PLAYER)
-            {
-                printf("@");
             }
         }
         printf("|\n");

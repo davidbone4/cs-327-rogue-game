@@ -20,9 +20,14 @@ typedef enum
     ROOM,
     CORRIDOR,
     UP,
-    DOWN,
-    PLAYER
+    DOWN
 } cellState;
+
+typedef struct positions
+{
+    uint8_t x, y;
+
+} position;
 
 typedef struct Cells
 {
@@ -48,13 +53,15 @@ typedef struct monster
     uint8_t x,y;
     int nextturn;
     int sequencenumber;
+    int alive;
+    position memory;
 }monster;
 
 typedef struct player
 {
     heap_node_t *hn;
     int speed;
-    uint8_t x,y;
+    position pos;
     int nextturn;
     int sequencenumber;
 }player;
@@ -78,11 +85,7 @@ typedef struct corridor_path
     uint32_t cost;
 } path_data;
 
-typedef struct positions
-{
-    uint8_t x, y;
 
-} position;
 
 
 
@@ -94,5 +97,6 @@ typedef enum
     INTELLIGENCE
 }behavior;
 void init_monsters(dungeon_type *d, int numMonsters);
-path_data ** nontunnel_path_finder(dungeon_type *d, int ystart, int xstart);
-path_data ** tunnel_path_finder(dungeon_type *d, int ystart, int xstart);
+int ** nontunnel_path_finder(dungeon_type *d, int ystart, int xstart);
+int ** tunnel_path_finder(dungeon_type *d, int ystart, int xstart);
+void movemonsternontunneling(dungeon_type *d, monster m);
