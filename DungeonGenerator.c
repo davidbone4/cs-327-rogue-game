@@ -56,23 +56,30 @@ int main(int argc, char const *argv[])
     init_monsters(d, 10);
     usleep(1000000);
     printDungeon();
-    for(int i = 0; i < dungeon.num_monsters; i ++){
+    for (int i = 0; i < dungeon.num_monsters; i++)
+    {
 
-        if(!dungeon.monsters[i].type[TUNNELING]){
+        printf("%s\n",dungeon.monsters[i].type);
+        if (dungeon.monsters[i].type[TUNNELING] == '0')
+        {
 
-            movemonsternontunneling(d,dungeon.monsters[i]);
+            movemonsternontunneling(d, dungeon.monsters[i]);
         }
     }
     usleep(1000000);
     printDungeon();
+
+    // free(dungeon.monsters);
+    // free(d);
     // nontunnel_path_finder(d);
     // tunnel_path_finder(d);
 }
 
 int generate()
 {
-
-    srand((unsigned)time(NULL));
+    int seed = 1614735398; //(unsigned)time(NULL);
+    srand(seed);
+    printf("generate seed: %d\n", seed);
 
     int numRooms = (rand() % (MAX_ROOMS - MIN_ROOMS + 1)) + MIN_ROOMS;
     dungeon.num_rooms = numRooms;
@@ -510,15 +517,15 @@ void printDungeon()
             int out = 0;
             for (int k = 0; k < dungeon.num_monsters; k++)
             {
-                if (dungeon.monsters[k].y == i && dungeon.monsters[k].x == j)
+                if (dungeon.monsters[k].y == i && dungeon.monsters[k].x == j && dungeon.monsters[k].alive)
                 {
                     printf("%c", dungeon.monsters[k].to_string);
                     out = 1;
                     break;
                 }
-
             }
-            if(out) continue;
+            if (out)
+                continue;
             if (dungeon.PC.pos.y == i && dungeon.PC.pos.x == j)
             {
                 printf("@");

@@ -12,8 +12,8 @@
 static int cellweight(int hardness);
 static int32_t path_cmp(const void *key, const void *with);
 
-int ** nontunnel_path_finder(dungeon_type *d, int ystart, int xstart);
-int ** tunnel_path_finder(dungeon_type *d, int ystart, int xstart);
+int **nontunnel_path_finder(dungeon_type *d, int ystart, int xstart);
+int **tunnel_path_finder(dungeon_type *d, int ystart, int xstart);
 
 static void print_distance_map(path_data path[DUNGEON_Y][DUNGEON_X], int pcY, int pcX);
 
@@ -22,7 +22,7 @@ static int32_t path_cmp(const void *key, const void *with)
     return ((path_data *)key)->cost - ((path_data *)with)->cost;
 }
 
-int** nontunnel_path_finder(dungeon_type *d, int ystart, int xstart)
+int **nontunnel_path_finder(dungeon_type *d, int ystart, int xstart)
 {
 
     dungeon_type dungeon = *d;
@@ -44,11 +44,8 @@ int** nontunnel_path_finder(dungeon_type *d, int ystart, int xstart)
         initialized = 1;
     }
 
-
-
     path[ystart][xstart].cost = 0;
 
-    printf("\n");
 
     heap_init(&h, path_cmp, NULL);
 
@@ -89,24 +86,27 @@ int** nontunnel_path_finder(dungeon_type *d, int ystart, int xstart)
         }
     }
 
+    heap_delete(&h);
     // print_distance_map(path, pcY, pcX);
-     int** result = malloc(DUNGEON_X*sizeof(int*));
+    int **result = malloc(DUNGEON_Y * sizeof(int *));
 
-    for(int i = 0; i < 3; i++) {
-        result[i] = malloc(sizeof(int*) * DUNGEON_Y);
+    for (int i = 0; i < DUNGEON_X; i++)
+    {
+        result[i] = malloc(DUNGEON_X * sizeof(int *));
     }
 
-    for(int i = 0; i <DUNGEON_Y; i++){
-        for(int j = 0; j< DUNGEON_X;j++){
+    for (int i = 0; i < DUNGEON_Y; i++)
+    {
+        for (int j = 0; j < DUNGEON_X; j++)
+        {
             result[i][j] = path[i][j].cost;
         }
     }
 
-
     return result;
 }
 
-int** tunnel_path_finder(dungeon_type *d, int ystart, int xstart)
+int **tunnel_path_finder(dungeon_type *d, int ystart, int xstart)
 {
 
     dungeon_type dungeon = *d;
@@ -129,8 +129,6 @@ int** tunnel_path_finder(dungeon_type *d, int ystart, int xstart)
     }
 
     path[ystart][xstart].cost = 0;
-
-    printf("\n");
 
     heap_init(&h, path_cmp, NULL);
 
@@ -171,22 +169,23 @@ int** tunnel_path_finder(dungeon_type *d, int ystart, int xstart)
         }
     }
 
+    heap_delete(&h);
     // print_distance_map(path, pcY, pcX);
 
+    int **result = malloc(DUNGEON_Y * sizeof(int *));
 
-
-    int** result = malloc(DUNGEON_X*sizeof(int*));
-
-    for(int i = 0; i < 3; i++) {
-        result[i] = malloc(sizeof(int*) * DUNGEON_Y);
+    for (int i = 0; i < DUNGEON_X; i++)
+    {
+        result[i] = malloc(DUNGEON_X * sizeof(int *));
     }
 
-    for(int i = 0; i <DUNGEON_Y; i++){
-        for(int j = 0; j< DUNGEON_X;j++){
+    for (int i = 0; i < DUNGEON_Y; i++)
+    {
+        for (int j = 0; j < DUNGEON_X; j++)
+        {
             result[i][j] = path[i][j].cost;
         }
     }
-
 
     return result;
 }
@@ -202,7 +201,6 @@ static int cellweight(int hardness)
         return 1 + (hardness / 85);
     }
 }
-
 
 static void print_distance_map(path_data path[DUNGEON_Y][DUNGEON_X], int pcY, int pcX)
 {

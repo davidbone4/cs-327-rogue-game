@@ -15,9 +15,9 @@ void movemonsternontunneling(dungeon_type *d, monster m);
 
 void init_monsters(dungeon_type *d, int numMonsters)
 {
-
-    srand((unsigned)time(NULL));
-
+    int seed = 1614733845; //(unsigned) time(NULL);
+    srand(seed);
+    printf("monster seed: %d\n", seed);
     monster *monsters = malloc(numMonsters * sizeof(monster));
 
     for (int i = 0; i < numMonsters; i++)
@@ -64,9 +64,9 @@ void movemonsternontunneling(dungeon_type *d, monster m)
     uint8_t nextY = m.y;
     uint8_t nextX = m.x;
 
-    if (m.type[INTELLIGENCE] && m.type[TELEPATHY])
+    if (atoi(&m.type[INTELLIGENCE]) && atoi(&m.type[TELEPATHY]))
     {
-        int **path = tunnel_path_finder(d, d->PC.pos.y, d->PC.pos.x);
+        int **path = nontunnel_path_finder(d, d->PC.pos.y, d->PC.pos.x);
 
         for (int y = m.y - 1; y <= m.y + 1; y++)
         {
@@ -85,11 +85,11 @@ void movemonsternontunneling(dungeon_type *d, monster m)
             }
         }
     }
-    else if (m.type[TELEPATHY]){
-
+    else if (atoi(&m.type[TELEPATHY]))
+    {
     }
-    else if(m.type[INTELLIGENCE]){
-
+    else if (atoi(&m.type[INTELLIGENCE]))
+    {
     }
     else
     {
@@ -128,18 +128,15 @@ void movemonsternontunneling(dungeon_type *d, monster m)
                 }
             }
 
-
-            if(d->map[shortestY][shortestX].type == ROOM ||d->map[shortestY][shortestX].type == CORRIDOR){
+            if (d->map[shortestY][shortestX].type == ROOM || d->map[shortestY][shortestX].type == CORRIDOR)
+            {
                 nextY = shortestY;
                 nextX = shortestX;
             }
-
-
-
         }
     }
 
-    if (m.type[ERRATIC])
+    if (atoi(&m.type[ERRATIC]))
     {
         int chance = rand() % 2;
 
@@ -150,34 +147,36 @@ void movemonsternontunneling(dungeon_type *d, monster m)
                 int randY, randX;
                 randY = (rand() % 3) + (m.y - 1);
                 randX = (rand() % 3) + (m.x - 1);
-                if (randY != m.y && randX != m.x)
+                if (randY == m.y && randX == m.x)
                 {
-                    if (d->map[randY][randX].type == ROOM || d->map[randY][randX].type == CORRIDOR)
-                    {
-                        nextY = randY;
-                        nextX = randX;
-                        break;
-                    }
+                    continue;
+                }
+
+                if (d->map[randY][randX].type == ROOM || d->map[randY][randX].type == CORRIDOR)
+                {
+                    nextY = randY;
+                    nextX = randX;
+                    break;
                 }
             }
         }
     }
 
-    for (int i = 0; i < d->num_monsters; i++)
+    if (m.y != nextY || m.x != nextX)
     {
-        if (d->monsters[i].y == nextY && d->monsters[i].x == nextX)
+        for (int i = 0; i < d->num_monsters; i++)
         {
-            d->monsters[i].alive = 0;
-        }
-        if(d->monsters[i].y == m.y && d->monsters[i].x == m.x){
-            d->monsters[i].y = nextY;
-            d->monsters[i].x = nextX;
+            if (d->monsters[i].y == nextY && d->monsters[i].x == nextX)
+            {
+                d->monsters[i].alive = 0;
+            }
+            if (d->monsters[i].y == m.y && d->monsters[i].x == m.x)
+            {
+                d->monsters[i].y = nextY;
+                d->monsters[i].x = nextX;
+            }
         }
     }
-
-
-
-
 }
 
 char *hextobinary(int num)
@@ -254,16 +253,16 @@ char *hextobinary(int num)
 int islineofsight(dungeon_type *d, monster m, position pc)
 {
 
-    int y = m.y;
-    int x = m.x;
+    uint8_t y = m.y;
+    uint8_t x = m.x;
 
     while (1)
     {
         double shortestdistance = sqrt(pow(y - pc.y, 2) + pow(x - pc.x, 2));
         double distance;
 
-        int yNext = y;
-        int xNext = x;
+        uint8_t yNext = y;
+        uint8_t xNext = x;
 
         for (int i = y - 1; i < y + 2; i++)
         {
@@ -289,13 +288,13 @@ int islineofsight(dungeon_type *d, monster m, position pc)
             return 0;
         }
 
-        if (yNext == pc.y && xNext == pc.y)
+        y = yNext;
+        x = xNext;
+
+        if (y == pc.y && x == pc.x)
         {
             break;
         }
-
-        y = yNext;
-        x = xNext;
     }
     return 1;
 }
