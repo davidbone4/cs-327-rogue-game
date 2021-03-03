@@ -44,7 +44,17 @@ int **nontunnel_path_finder(dungeon_type *d, int ystart, int xstart)
         initialized = 1;
     }
 
+
+    for (y = 0; y < DUNGEON_Y; y++)
+    {
+        for (x = 0; x < DUNGEON_X; x++)
+        {
+            path[y][x].cost = INT_MAX;
+        }
+    }
+
     path[ystart][xstart].cost = 0;
+
 
 
     heap_init(&h, path_cmp, NULL);
@@ -85,9 +95,12 @@ int **nontunnel_path_finder(dungeon_type *d, int ystart, int xstart)
             }
         }
     }
+    free(p);
 
     heap_delete(&h);
-    // print_distance_map(path, pcY, pcX);
+
+
+    // print_distance_map(path, d->PC.pos.y, d->PC.pos.x);
     int **result = malloc(DUNGEON_Y * sizeof(int *));
 
     for (int i = 0; i < DUNGEON_X; i++)
@@ -100,8 +113,10 @@ int **nontunnel_path_finder(dungeon_type *d, int ystart, int xstart)
         for (int j = 0; j < DUNGEON_X; j++)
         {
             result[i][j] = path[i][j].cost;
+            free(path[i][j].hn);
         }
     }
+
 
     return result;
 }
@@ -126,6 +141,14 @@ int **tunnel_path_finder(dungeon_type *d, int ystart, int xstart)
             }
         }
         initialized = 1;
+    }
+
+    for (y = 0; y < DUNGEON_Y; y++)
+    {
+        for (x = 0; x < DUNGEON_X; x++)
+        {
+            path[y][x].cost = INT_MAX;
+        }
     }
 
     path[ystart][xstart].cost = 0;

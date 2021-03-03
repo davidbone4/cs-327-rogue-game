@@ -87,9 +87,71 @@ void movemonsternontunneling(dungeon_type *d, monster m)
     }
     else if (atoi(&m.type[TELEPATHY]))
     {
+
+        m.memory.y = d->PC.pos.y;
+        m.memory.x = d->PC.pos.x;
+
+        double shortestdistance = sqrt(pow(m.y - m.memory.y, 2) + pow(m.x - m.memory.x, 2));
+        double distance;
+
+        int shortestY = m.y;
+        int shortestX = m.x;
+
+        for (int i = m.y - 1; i < m.y + 2; i++)
+        {
+            for (int j = m.x - 1; j < m.x + 2; j++)
+            {
+                if (i == m.y && j == m.x)
+                {
+                    continue;
+                }
+
+                distance = sqrt(pow((i)-m.memory.y, 2) + pow((j)-m.memory.x, 2));
+                if (shortestdistance > distance)
+                {
+                    shortestY = i;
+                    shortestX = j;
+                    shortestdistance = distance;
+                }
+            }
+        }
+
+        if (d->map[shortestY][shortestX].type == ROOM || d->map[shortestY][shortestX].type == CORRIDOR)
+        {
+            nextY = shortestY;
+            nextX = shortestX;
+        }
     }
     else if (atoi(&m.type[INTELLIGENCE]))
     {
+        if (islineofsight(d, m, d->PC.pos))
+        {
+            m.memory.y = d->PC.pos.y;
+            m.memory.x = d->PC.pos.x;
+        }
+
+        if (m.memory.y && m.memory.x)
+        {
+
+            int **path = nontunnel_path_finder(d, m.memory.y, m.memory.x);
+
+            for (int y = m.y - 1; y <= m.y + 1; y++)
+            {
+                for (int x = m.x - 1; x <= m.x + 1; x++)
+                {
+                    if (y == m.y && x == m.x)
+                    {
+                        continue;
+                    }
+                    if (path[y][x] < path[m.y][m.x])
+                    {
+
+                        nextY = y;
+                        nextX = x;
+                    }
+                }
+            }
+        }
     }
     else
     {
@@ -100,7 +162,7 @@ void movemonsternontunneling(dungeon_type *d, monster m)
             m.memory.x = d->PC.pos.x;
         }
 
-        if (m.memory.y && m.memory.y)
+        if (m.memory.y && m.memory.x)
         {
 
             double shortestdistance = sqrt(pow(m.y - m.memory.y, 2) + pow(m.x - m.memory.x, 2));

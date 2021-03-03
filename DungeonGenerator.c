@@ -56,6 +56,8 @@ int main(int argc, char const *argv[])
     init_monsters(d, 10);
     usleep(1000000);
     printDungeon();
+
+
     for (int i = 0; i < dungeon.num_monsters; i++)
     {
 
@@ -71,7 +73,7 @@ int main(int argc, char const *argv[])
 
     // free(dungeon.monsters);
     // free(d);
-    // nontunnel_path_finder(d);
+    // nontunnel_path_finder(d, dungeon.PC.pos.y,dungeon.PC.pos.x);
     // tunnel_path_finder(d);
 }
 
