@@ -12,10 +12,11 @@ char *hextobinary(int num);
 int islineofsight(dungeon_type *d, monster m, position pc);
 
 void movemonsternontunneling(dungeon_type *d, monster m);
+void move_monster_tunneling(dungeon_type *d, monster m);
 
 void init_monsters(dungeon_type *d, int numMonsters)
 {
-    int seed = 1614733845; //(unsigned) time(NULL);
+    int seed =  1614813037; //(unsigned) time(NULL);
     srand(seed);
     printf("monster seed: %d\n", seed);
     monster *monsters = malloc(numMonsters * sizeof(monster));
@@ -46,7 +47,7 @@ void init_monsters(dungeon_type *d, int numMonsters)
         {
             int Y = (rand() % (DUNGEON_Y - 1)) + 1;
             int X = (rand() % (DUNGEON_X - 1)) + 1;
-            if (d->map[Y][X].type == ROOM || d->map[Y][X].type == CORRIDOR)
+            if ((d->map[Y][X].type == ROOM || d->map[Y][X].type == CORRIDOR) && !(d->PC.pos.y == Y && d->PC.pos.x ==X))
             {
                 monsters[i].y = Y;
                 monsters[i].x = X;
@@ -64,9 +65,10 @@ void movemonsternontunneling(dungeon_type *d, monster m)
     uint8_t nextY = m.y;
     uint8_t nextX = m.x;
 
-    if (atoi(&m.type[INTELLIGENCE]) && atoi(&m.type[TELEPATHY]))
+    if (m.type[INTELLIGENCE] == '1' && m.type[TELEPATHY] == '1')
     {
-        int **path = nontunnel_path_finder(d, d->PC.pos.y, d->PC.pos.x);
+
+        nontunnel_path_finder(d, d->PC.pos.y, d->PC.pos.x);
 
         for (int y = m.y - 1; y <= m.y + 1; y++)
         {
@@ -76,7 +78,7 @@ void movemonsternontunneling(dungeon_type *d, monster m)
                 {
                     continue;
                 }
-                if (path[y][x] < path[m.y][m.x])
+                if (d->distance[y][x] < d->distance[m.y][m.x])
                 {
 
                     nextY = y;
@@ -85,7 +87,7 @@ void movemonsternontunneling(dungeon_type *d, monster m)
             }
         }
     }
-    else if (atoi(&m.type[TELEPATHY]))
+    else if (m.type[TELEPATHY] == '1')
     {
 
         m.memory.y = d->PC.pos.y;
@@ -116,13 +118,13 @@ void movemonsternontunneling(dungeon_type *d, monster m)
             }
         }
 
-        if (d->map[shortestY][shortestX].type == ROOM || d->map[shortestY][shortestX].type == CORRIDOR)
+        if (d->map[shortestY][shortestX].type != ROCK )
         {
             nextY = shortestY;
             nextX = shortestX;
         }
     }
-    else if (atoi(&m.type[INTELLIGENCE]))
+    else if (m.type[INTELLIGENCE] == '1')
     {
         if (islineofsight(d, m, d->PC.pos))
         {
@@ -130,10 +132,10 @@ void movemonsternontunneling(dungeon_type *d, monster m)
             m.memory.x = d->PC.pos.x;
         }
 
-        if (m.memory.y && m.memory.x)
+        if (m.memory.y != 0 && m.memory.x != 0)
         {
 
-            int **path = nontunnel_path_finder(d, m.memory.y, m.memory.x);
+            nontunnel_path_finder(d, m.memory.y, m.memory.x);
 
             for (int y = m.y - 1; y <= m.y + 1; y++)
             {
@@ -143,7 +145,7 @@ void movemonsternontunneling(dungeon_type *d, monster m)
                     {
                         continue;
                     }
-                    if (path[y][x] < path[m.y][m.x])
+                    if (d->distance[y][x] < d->distance[m.y][m.x])
                     {
 
                         nextY = y;
@@ -190,7 +192,7 @@ void movemonsternontunneling(dungeon_type *d, monster m)
                 }
             }
 
-            if (d->map[shortestY][shortestX].type == ROOM || d->map[shortestY][shortestX].type == CORRIDOR)
+            if (d->map[shortestY][shortestX].type != ROCK)
             {
                 nextY = shortestY;
                 nextX = shortestX;
@@ -198,7 +200,7 @@ void movemonsternontunneling(dungeon_type *d, monster m)
         }
     }
 
-    if (atoi(&m.type[ERRATIC]))
+    if (m.type[ERRATIC] == '1')
     {
         int chance = rand() % 2;
 
@@ -214,7 +216,7 @@ void movemonsternontunneling(dungeon_type *d, monster m)
                     continue;
                 }
 
-                if (d->map[randY][randX].type == ROOM || d->map[randY][randX].type == CORRIDOR)
+                if (d->map[randY][randX].type != ROCK )
                 {
                     nextY = randY;
                     nextX = randX;
@@ -226,6 +228,207 @@ void movemonsternontunneling(dungeon_type *d, monster m)
 
     if (m.y != nextY || m.x != nextX)
     {
+        for (int i = 0; i < d->num_monsters; i++)
+        {
+            if (d->monsters[i].y == nextY && d->monsters[i].x == nextX)
+            {
+                d->monsters[i].alive = 0;
+            }
+            if (d->monsters[i].y == m.y && d->monsters[i].x == m.x)
+            {
+                d->monsters[i].y = nextY;
+                d->monsters[i].x = nextX;
+            }
+        }
+    }
+}
+
+void move_monster_tunneling(dungeon_type *d, monster m)
+{
+    uint8_t nextY = m.y;
+    uint8_t nextX = m.x;
+
+    if (m.type[INTELLIGENCE] == '1' && m.type[TELEPATHY] == '1')
+    {
+
+        tunnel_path_finder(d, d->PC.pos.y, d->PC.pos.x);
+
+        for (int y = m.y - 1; y <= m.y + 1; y++)
+        {
+            for (int x = m.x - 1; x <= m.x + 1; x++)
+            {
+                if (y == m.y && x == m.x)
+                {
+                    continue;
+                }
+                if (d->pc_tunnel[y][x] < d->pc_tunnel[m.y][m.x])
+                {
+
+                    nextY = y;
+                    nextX = x;
+                }
+            }
+        }
+    }
+    else if (m.type[TELEPATHY] == '1')
+    {
+
+        m.memory.y = d->PC.pos.y;
+        m.memory.x = d->PC.pos.x;
+
+        double shortestdistance = sqrt(pow(m.y - m.memory.y, 2) + pow(m.x - m.memory.x, 2));
+        double distance;
+
+        int shortestY = m.y;
+        int shortestX = m.x;
+
+        for (int i = m.y - 1; i < m.y + 2; i++)
+        {
+            for (int j = m.x - 1; j < m.x + 2; j++)
+            {
+                if (i == m.y && j == m.x)
+                {
+                    continue;
+                }
+
+                distance = sqrt(pow((i)-m.memory.y, 2) + pow((j)-m.memory.x, 2));
+                if (shortestdistance > distance)
+                {
+                    shortestY = i;
+                    shortestX = j;
+                    shortestdistance = distance;
+                }
+            }
+        }
+
+        if (d->map[shortestY][shortestX].type < 255 )
+        {
+            nextY = shortestY;
+            nextX = shortestX;
+        }
+    }
+    else if (m.type[INTELLIGENCE] == '1')
+    {
+        if (islineofsight(d, m, d->PC.pos))
+        {
+            m.memory.y = d->PC.pos.y;
+            m.memory.x = d->PC.pos.x;
+        }
+
+        if (m.memory.y != 0 && m.memory.x != 0)
+        {
+
+            tunnel_path_finder(d, m.memory.y, m.memory.x);
+
+            for (int y = m.y - 1; y <= m.y + 1; y++)
+            {
+                for (int x = m.x - 1; x <= m.x + 1; x++)
+                {
+                    if (y == m.y && x == m.x)
+                    {
+                        continue;
+                    }
+                    if (d->pc_tunnel[y][x] < d->pc_tunnel[m.y][m.x])
+                    {
+
+                        nextY = y;
+                        nextX = x;
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+
+        if (islineofsight(d, m, d->PC.pos))
+        {
+            m.memory.y = d->PC.pos.y;
+            m.memory.x = d->PC.pos.x;
+        }
+
+        if (m.memory.y && m.memory.x)
+        {
+
+            double shortestdistance = sqrt(pow(m.y - m.memory.y, 2) + pow(m.x - m.memory.x, 2));
+            double distance;
+
+            int shortestY = m.y;
+            int shortestX = m.x;
+
+            for (int i = m.y - 1; i < m.y + 2; i++)
+            {
+                for (int j = m.x - 1; j < m.x + 2; j++)
+                {
+                    if (i == m.y && j == m.x)
+                    {
+                        continue;
+                    }
+
+                    distance = sqrt(pow((i)-m.memory.y, 2) + pow((j)-m.memory.x, 2));
+                    if (shortestdistance > distance)
+                    {
+                        shortestY = i;
+                        shortestX = j;
+                        shortestdistance = distance;
+                    }
+                }
+            }
+
+            if (d->map[shortestY][shortestX].type < 255)
+            {
+                nextY = shortestY;
+                nextX = shortestX;
+            }
+        }
+    }
+
+    if (m.type[ERRATIC] == '1')
+    {
+        int chance = rand() % 2;
+
+        if (chance)
+        {
+            while (1)
+            {
+                int randY, randX;
+                randY = (rand() % 3) + (m.y - 1);
+                randX = (rand() % 3) + (m.x - 1);
+                if (randY == m.y && randX == m.x)
+                {
+                    continue;
+                }
+
+                if (d->map[randY][randX].hardness < 255 )
+                {
+                    nextY = randY;
+                    nextX = randX;
+                    break;
+                }
+            }
+        }
+    }
+
+    if(d->map[nextY][nextX].hardness > 0){
+        if(d->map[nextY][nextX].hardness - 85<= 0){
+            d->map[nextY][nextX].hardness = 0;
+            d->map[nextY][nextX].type = CORRIDOR;
+        }
+        else
+        {
+            d->map[nextY][nextX].hardness -= 85;
+            nextY = m.y;
+            nextX = m.x;
+        }
+
+    }
+
+    if (m.y != nextY || m.x != nextX)
+    {
+        if (d->PC.pos.y == nextY && d->PC.pos.x == nextX)
+            {
+                d->PC.alive = 0;
+            }
         for (int i = 0; i < d->num_monsters; i++)
         {
             if (d->monsters[i].y == nextY && d->monsters[i].x == nextX)

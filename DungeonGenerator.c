@@ -22,7 +22,7 @@ int main(int argc, char const *argv[])
 {
     int boolsave = 0;
     int boolload = 0;
-
+    int nummon = 10;
     for (int i = 1; i < argc; i++)
     {
         if (strcmp(argv[i], "--save") == 0)
@@ -33,7 +33,13 @@ int main(int argc, char const *argv[])
         {
             boolload = 1;
         }
+        else if(strcmp(argv[i], "--nummon") == 0){
+            nummon = (int)strtol(argv[i + 1], NULL, 10);
+            i++;
+        }
+
     }
+
 
     if (boolload == 1)
     {
@@ -53,19 +59,26 @@ int main(int argc, char const *argv[])
     dungeon_type *d;
     d = &dungeon;
 
-    init_monsters(d, 10);
+    init_monsters(d, nummon);
     usleep(1000000);
     printDungeon();
-
 
     for (int i = 0; i < dungeon.num_monsters; i++)
     {
 
-        printf("%s\n",dungeon.monsters[i].type);
+        printf("%s: %c\n", dungeon.monsters[i].type,dungeon.monsters[i].to_string);
+
         if (dungeon.monsters[i].type[TUNNELING] == '0')
         {
-
+            dungeon_type *d;
+            d = &dungeon;
             movemonsternontunneling(d, dungeon.monsters[i]);
+        }
+        else
+        {
+            dungeon_type *d;
+            d = &dungeon;
+            move_monster_tunneling(d, dungeon.monsters[i]);
         }
     }
     usleep(1000000);
@@ -79,7 +92,7 @@ int main(int argc, char const *argv[])
 
 int generate()
 {
-    int seed = 1614735398; //(unsigned)time(NULL);
+    int seed = 1614813037; //(unsigned)time(NULL);
     srand(seed);
     printf("generate seed: %d\n", seed);
 
