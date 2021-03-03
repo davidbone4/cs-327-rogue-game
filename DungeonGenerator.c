@@ -4,6 +4,8 @@
 #include <time.h>
 #include <math.h>
 #include <endian.h>
+#include <unistd.h>
+
 
 #include "dungeondefinitions.h"
 
@@ -15,7 +17,7 @@ int generate();
 
 int load();
 
-int write();
+int writetodisk();
 
 int main(int argc, char const *argv[])
 {
@@ -45,21 +47,42 @@ int main(int argc, char const *argv[])
 
     printDungeon();
 
-    dungeon_type *d;
-    d = &dungeon;
-    nontunnel_path_finder(d);
-    tunnel_path_finder(d);
-
     if (boolsave == 1)
     {
-        write();
+        writetodisk();
     }
+    dungeon_type *d;
+    d = &dungeon;
+
+    init_monsters(d, 10);
+    usleep(1000000);
+    printDungeon();
+
+
+    for (int i = 0; i < dungeon.num_monsters; i++)
+    {
+
+        printf("%s\n",dungeon.monsters[i].type);
+        if (dungeon.monsters[i].type[TUNNELING] == '0')
+        {
+
+            movemonsternontunneling(d, dungeon.monsters[i]);
+        }
+    }
+    usleep(1000000);
+    printDungeon();
+
+    // free(dungeon.monsters);
+    // free(d);
+    // nontunnel_path_finder(d, dungeon.PC.pos.y,dungeon.PC.pos.x);
+    // tunnel_path_finder(d);
 }
 
 int generate()
 {
-
-    srand((unsigned)time(NULL));
+    int seed = 1614735398; //(unsigned)time(NULL);
+    srand(seed);
+    printf("generate seed: %d\n", seed);
 
     int numRooms = (rand() % (MAX_ROOMS - MIN_ROOMS + 1)) + MIN_ROOMS;
     dungeon.num_rooms = numRooms;
@@ -235,7 +258,8 @@ int generate()
         int pcX = (rand() % (DUNGEON_X - 1)) + 1;
         if (dungeon.map[pcY][pcX].type == ROOM)
         {
-            dungeon.map[pcY][pcX].type = PLAYER;
+            dungeon.PC.pos.y = pcY;
+            dungeon.PC.pos.x = pcX;
             break;
         }
     }
@@ -279,6 +303,9 @@ int load()
     position PC;
     fread(&PC.x, 1, 1, fr);
     fread(&PC.y, 1, 1, fr);
+
+    dungeon.PC.pos.y = PC.y;
+    dungeon.PC.pos.x = PC.x;
 
     for (int i = 0; i < DUNGEON_Y; i++)
     {
@@ -356,14 +383,12 @@ int load()
         dungeon.map[downstairs.y][downstairs.x].type = DOWN;
     }
 
-    dungeon.map[PC.y][PC.x].type = PLAYER;
-
     fclose(fr);
 
     return 0;
 }
 
-int write()
+int writetodisk()
 {
     uint16_t numUp, numDown;
     numUp = 0;
@@ -382,11 +407,6 @@ int write()
             else if (dungeon.map[i][j].type == DOWN)
             {
                 numDown++;
-            }
-            else if (dungeon.map[i][j].type == PLAYER)
-            {
-                PC.x = j;
-                PC.y = i;
             }
         }
     }
@@ -497,30 +517,41 @@ void printDungeon()
         printf("|");
         for (int j = 0; j < DUNGEON_X; j++)
         {
-
-            if (dungeon.map[i][j].type == 0)
+            int out = 0;
+            for (int k = 0; k < dungeon.num_monsters; k++)
+            {
+                if (dungeon.monsters[k].y == i && dungeon.monsters[k].x == j && dungeon.monsters[k].alive)
+                {
+                    printf("%c", dungeon.monsters[k].to_string);
+                    out = 1;
+                    break;
+                }
+            }
+            if (out)
+                continue;
+            if (dungeon.PC.pos.y == i && dungeon.PC.pos.x == j)
+            {
+                printf("@");
+            }
+            else if (dungeon.map[i][j].type == ROCK)
             {
                 printf(" ");
             }
-            else if (dungeon.map[i][j].type == 1)
+            else if (dungeon.map[i][j].type == ROOM)
             {
                 printf(".");
             }
-            else if (dungeon.map[i][j].type == 2)
+            else if (dungeon.map[i][j].type == CORRIDOR)
             {
                 printf("#");
             }
-            else if (dungeon.map[i][j].type == 3)
+            else if (dungeon.map[i][j].type == UP)
             {
                 printf("<");
             }
-            else if (dungeon.map[i][j].type == 4)
+            else if (dungeon.map[i][j].type == DOWN)
             {
                 printf(">");
-            }
-            else if (dungeon.map[i][j].type == 5)
-            {
-                printf("@");
             }
         }
         printf("|\n");

@@ -6,3 +6,6 @@ turnins/
 endian.h
 DungeonGenerator
 rlg327
+monster
+heap
+pathfinding
