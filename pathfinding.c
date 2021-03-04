@@ -302,7 +302,7 @@ void tunnel_path_finder(dungeon_type *d, int ystart, int xstart)
   }
   heap_delete(&h);
 
-  print_distance_map_tunnel(d,d->PC.pos.y,d->PC.pos.x);
+//   print_distance_map_tunnel(d,d->PC.pos.y,d->PC.pos.x);
 }
 
 static int cellweight(int hardness)

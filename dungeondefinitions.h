@@ -56,22 +56,14 @@ typedef struct monster
     int speed;
     char to_string;
     char* type;
-    uint8_t x,y;
-    int nextturn;
-    int sequencenumber;
-    int alive;
-    position memory;
-}monster;
-
-typedef struct player
-{
-    heap_node_t *hn;
-    int speed;
     position pos;
     int nextturn;
     int sequencenumber;
     int alive;
-}player;
+    position memory;
+    int isNPC;
+}monster;
+
 typedef struct dungeon
 {
     cell map[DUNGEON_Y][DUNGEON_X];
@@ -79,7 +71,7 @@ typedef struct dungeon
     uint16_t num_rooms;
     monster * monsters;
     int num_monsters;
-    player PC;
+    monster PC;
     uint8_t distance[DUNGEON_Y][DUNGEON_X];
     uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
 } dungeon_type;
@@ -108,5 +100,7 @@ typedef enum
 void init_monsters(dungeon_type *d, int numMonsters);
 void nontunnel_path_finder(dungeon_type *d, int ystart, int xstart);
 void tunnel_path_finder(dungeon_type *d, int ystart, int xstart);
-void movemonsternontunneling(dungeon_type *d, monster m);
-void move_monster_tunneling(dungeon_type *d, monster m);
+void movemonsternontunneling(dungeon_type *d, monster *m);
+void move_monster_tunneling(dungeon_type *d, monster *m);
+void run_game(dungeon_type *d);
+void printDungeon(dungeon_type *d);

@@ -10,7 +10,7 @@
 
 dungeon_type dungeon;
 
-void printDungeon();
+void printDungeon(dungeon_type *d);
 
 int generate();
 
@@ -33,13 +33,12 @@ int main(int argc, char const *argv[])
         {
             boolload = 1;
         }
-        else if(strcmp(argv[i], "--nummon") == 0){
+        else if (strcmp(argv[i], "--nummon") == 0)
+        {
             nummon = (int)strtol(argv[i + 1], NULL, 10);
             i++;
         }
-
     }
-
 
     if (boolload == 1)
     {
@@ -50,51 +49,32 @@ int main(int argc, char const *argv[])
         generate();
     }
 
-    printDungeon();
+    dungeon.PC.alive = 1;
+    dungeon.PC.nextturn = 0;
+    dungeon.PC.sequencenumber = 0;
+    dungeon.PC.speed = 10;
+    dungeon.PC.to_string = '@';
+    dungeon.PC.isNPC = 0;
+
+    dungeon_type *d;
+    d = &dungeon;
+    printDungeon(d);
 
     if (boolsave == 1)
     {
         writetodisk();
     }
-    dungeon_type *d;
-    d = &dungeon;
 
     init_monsters(d, nummon);
-    usleep(1000000);
-    printDungeon();
+    run_game(d);
 
-    for (int i = 0; i < dungeon.num_monsters; i++)
-    {
-
-        printf("%s: %c\n", dungeon.monsters[i].type,dungeon.monsters[i].to_string);
-
-        if (dungeon.monsters[i].type[TUNNELING] == '0')
-        {
-            dungeon_type *d;
-            d = &dungeon;
-            movemonsternontunneling(d, dungeon.monsters[i]);
-        }
-        else
-        {
-            dungeon_type *d;
-            d = &dungeon;
-            move_monster_tunneling(d, dungeon.monsters[i]);
-        }
-    }
-    usleep(1000000);
-    printDungeon();
-
-    // free(dungeon.monsters);
-    // free(d);
-    // nontunnel_path_finder(d, dungeon.PC.pos.y,dungeon.PC.pos.x);
-    // tunnel_path_finder(d);
 }
 
 int generate()
 {
-    int seed = 1614813037; //(unsigned)time(NULL);
+    int seed = (unsigned)time(NULL);
     srand(seed);
-    printf("generate seed: %d\n", seed);
+    // printf("generate seed: %d\n", seed);
 
     int numRooms = (rand() % (MAX_ROOMS - MIN_ROOMS + 1)) + MIN_ROOMS;
     dungeon.num_rooms = numRooms;
@@ -515,7 +495,7 @@ int writetodisk()
     fclose(fw);
     return 0;
 }
-void printDungeon()
+void printDungeon(dungeon_type *d)
 {
     for (int i = 0; i < DUNGEON_X + 2; i++)
     {
@@ -530,38 +510,38 @@ void printDungeon()
         for (int j = 0; j < DUNGEON_X; j++)
         {
             int out = 0;
-            for (int k = 0; k < dungeon.num_monsters; k++)
+            for (int k = 0; k < d->num_monsters; k++)
             {
-                if (dungeon.monsters[k].y == i && dungeon.monsters[k].x == j && dungeon.monsters[k].alive)
+                if (d->monsters[k].pos.y == i && d->monsters[k].pos.x == j && d->monsters[k].alive)
                 {
-                    printf("%c", dungeon.monsters[k].to_string);
+                    printf("%c", d->monsters[k].to_string);
                     out = 1;
                     break;
                 }
             }
             if (out)
                 continue;
-            if (dungeon.PC.pos.y == i && dungeon.PC.pos.x == j)
+            if (d->PC.pos.y == i && d->PC.pos.x == j)
             {
                 printf("@");
             }
-            else if (dungeon.map[i][j].type == ROCK)
+            else if (d->map[i][j].type == ROCK)
             {
                 printf(" ");
             }
-            else if (dungeon.map[i][j].type == ROOM)
+            else if (d->map[i][j].type == ROOM)
             {
                 printf(".");
             }
-            else if (dungeon.map[i][j].type == CORRIDOR)
+            else if (d->map[i][j].type == CORRIDOR)
             {
                 printf("#");
             }
-            else if (dungeon.map[i][j].type == UP)
+            else if (d->map[i][j].type == UP)
             {
                 printf("<");
             }
-            else if (dungeon.map[i][j].type == DOWN)
+            else if (d->map[i][j].type == DOWN)
             {
                 printf(">");
             }
