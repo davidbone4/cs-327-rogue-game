@@ -23,6 +23,12 @@ typedef enum
     DOWN
 } cellState;
 
+typedef enum dim {
+  dim_x,
+  dim_y,
+  num_dims
+} dim_t;
+
 typedef struct positions
 {
     uint8_t x, y;
@@ -50,21 +56,14 @@ typedef struct monster
     int speed;
     char to_string;
     char* type;
-    uint8_t x,y;
+    position pos;
     int nextturn;
     int sequencenumber;
     int alive;
     position memory;
+    int isNPC;
 }monster;
 
-typedef struct player
-{
-    heap_node_t *hn;
-    int speed;
-    position pos;
-    int nextturn;
-    int sequencenumber;
-}player;
 typedef struct dungeon
 {
     cell map[DUNGEON_Y][DUNGEON_X];
@@ -72,7 +71,9 @@ typedef struct dungeon
     uint16_t num_rooms;
     monster * monsters;
     int num_monsters;
-    player PC;
+    monster PC;
+    uint8_t distance[DUNGEON_Y][DUNGEON_X];
+    uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
 } dungeon_type;
 
 
@@ -97,6 +98,9 @@ typedef enum
     INTELLIGENCE
 }behavior;
 void init_monsters(dungeon_type *d, int numMonsters);
-int ** nontunnel_path_finder(dungeon_type *d, int ystart, int xstart);
-int ** tunnel_path_finder(dungeon_type *d, int ystart, int xstart);
-void movemonsternontunneling(dungeon_type *d, monster m);
+void nontunnel_path_finder(dungeon_type *d, int ystart, int xstart);
+void tunnel_path_finder(dungeon_type *d, int ystart, int xstart);
+void movemonsternontunneling(dungeon_type *d, monster *m);
+void move_monster_tunneling(dungeon_type *d, monster *m);
+void run_game(dungeon_type *d);
+void printDungeon(dungeon_type *d);

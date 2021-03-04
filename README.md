@@ -1,5 +1,27 @@
 # cs-327-rogue-game by David bone
 
+## Assignment 1.04
+
+This assignment added monsters and allowed those monsters to move. This utilized a proirity queue using the heap.c file.
+I also had a memory issue when using my pathfinding algorithm from last week, so I decided to scrap it and use Professor Sheaffer's logic.
+
+I separated the monsters into a tunneling and non-tunneling method. If a monster was intelligent, it always used the pathfinding algorithm. If a monster was not intelligent, then it used a simple Pythagorean Therom method to find its way to the PC
+
+If a monster was Telepathic, it always used the current location of the PC to pathfind. If it was not, I used a memory variable as well as a islineofsight method to determine if or where to move.
+
+I decided to not implement logic to have the character move.
+
+USAGE:
+
+    >make
+    > ./rlg327 --nummon <desired integer of monsters>
+
+If --nummon is not used, the default value is 10.
+
+Tested on Ubuntu
+
+Thank you!
+
 ## Assignment 1.03
 
 This assignment adds distance map generation for both tunneling and non-tunneling. Both are automatically output when the program is ran.

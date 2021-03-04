@@ -26,9 +26,11 @@ extern "C"
   heap_node_t *heap_insert(heap_t *h, void *v);
   void *heap_peek_min(heap_t *h);
   void *heap_remove_min(heap_t *h);
+  void heap_node_delete(heap_t *h, heap_node_t *hn);
   int heap_combine(heap_t *h, heap_t *h1, heap_t *h2);
   int heap_decrease_key(heap_t *h, heap_node_t *n, void *v);
   int heap_decrease_key_no_replace(heap_t *h, heap_node_t *n);
+  void print_heap(heap_t *h, char *(*print)(const void *v));
 
 #ifdef __cplusplus
 }
