@@ -55,7 +55,7 @@
     => updated path finding methods to take in a starting position
     => began fixing monsters and PC being stored in the grid.
 3/2/2021
-    => Had an issue with memory allocation with my path finding. I scraped mine and used Sheaffer's
+    => Had an issue with memory allocation with my path finding. I scrapped mine and used Sheaffer's
     => Wrote logic to move non tunneling monsters.
 3/3/2021
     => Wrote logic to move tunneling monsters.
