@@ -25,7 +25,7 @@
 2/16/2021
     => added define statements to easily change dungeon parameters.
     => created load.c which currently take a file at $HOME/.rlg327/dungeon and reads The first 3 parameters
-2/17/2022
+2/17/2021
     => added corridor, room and player character load from file.
     => added full load from file
     => combined load.c and dungeongenerator.c into one file.
@@ -33,24 +33,36 @@
     => added write method to write to a file
     => made dungeon a global variable
     => added command line argument support
-2/18/2022
+2/18/2021
     => tested on Ubuntu
     => update README.md and CHANGELOG.md
     => created zip and turned in assignment1.02
-2/22/2022
+2/22/2021
     => copied professor Sheaffer's algorithm to base my pathfinder logic.
     => created new file pathfinding.c
-2/23/2022
+2/23/2021
     => created .h file to store all definitions for all files
     => changed hardness and other vars from signed to unsigned
     => correctly added non-tunneling path generation
     => correctly added tunneling path generation
     => tested on Ubuntu
-2/24/2022
+2/24/2021
     => update README.md and turned in assignment1.03
-3/2/2022
+3/2/2021
     => Created a monster struct and used an array within dungeon to store them
     => created monster.c and init_monsters method.
     => wrote logic to randomly determine type of monster and print hex numbers
     => updated path finding methods to take in a starting position
     => began fixing monsters and PC being stored in the grid.
+3/2/2021
+    => Had an issue with memory allocation with my path finding. I scraped mine and used Sheaffer's
+    => Wrote logic to move non tunneling monsters.
+3/3/2021
+    => Wrote logic to move tunneling monsters.
+    => Began work on the Heap that runs the game
+    => Changed the PC character to be a monster type
+    => fixed issue where nontunneling monsters could not kill pc
+    => added game over text.
+    => Updated CHANGELOG.md and README.md
+    => Tested on Ubuntu
+    => Turned in Assignment1.04
