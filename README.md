@@ -2,12 +2,12 @@
 
 ## Assignment 1.04
 
-This assignment added monsters and allowed those monsters to move. This utilized a proirity queue using the heap.c file.
+This assignment added monsters and allowed those monsters to move. This utilized a priority queue using the heap.c file.
 I also had a memory issue when using my pathfinding algorithm from last week, so I decided to scrap it and use Professor Sheaffer's logic.
 
-I separated the monsters into a tunneling and non-tunneling method. If a monster was intelligent, it always used the pathfinding algorithm. If a monster was not intelligent, then it used a simple Pythagorean Therom method to find its way to the PC
+I separated the monsters into a tunneling and non-tunneling method. If a monster was intelligent, it always used the pathfinding algorithm. If a monster was not intelligent, then it used a simple Pythagorean Theorem method to find its way to the PC
 
-If a monster was Telepathic, it always used the current location of the PC to pathfind. If it was not, I used a memory variable as well as a islineofsight method to determine if or where to move.
+If a monster was Telepathic, it always used the current location of the PC to path-find. If it was not, I used a memory variable as well as a islineofsight method to determine if or where to move.
 
 I decided to not implement logic to have the character move.
 

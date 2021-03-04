@@ -1,7 +1,6 @@
 *.out
 *.dSYM
 .vscode/
-turnins/
 .DS_Store
 endian.h
 DungeonGenerator
