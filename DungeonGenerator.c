@@ -497,16 +497,13 @@ int writetodisk()
 }
 void printDungeon(dungeon_type *d)
 {
-    for (int i = 0; i < DUNGEON_X + 2; i++)
-    {
-        printf("-");
-    }
+
 
     printf("\n");
 
     for (int i = 0; i < DUNGEON_Y; i++)
     {
-        printf("|");
+
         for (int j = 0; j < DUNGEON_X; j++)
         {
             int out = 0;
@@ -546,13 +543,9 @@ void printDungeon(dungeon_type *d)
                 printf(">");
             }
         }
-        printf("|\n");
+        printf("\n");
     }
 
-    for (int i = 0; i < DUNGEON_X + 2; i++)
-    {
-        printf("-");
-    }
 
     printf("\n");
 }

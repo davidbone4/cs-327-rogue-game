@@ -66,3 +66,5 @@
     => Updated CHANGELOG.md and README.md
     => Tested on Ubuntu
     => Turned in Assignment1.04
+3/7/2021
+    => Removed border around dungeon display (finally)
