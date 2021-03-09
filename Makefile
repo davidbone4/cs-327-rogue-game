@@ -7,7 +7,7 @@ ECHO = echo
 RM = rm -f
 
 build:
-	gcc DungeonGenerator.c pathfinding.c heap.c monster.c -o rlg327 -lm
+	gcc DungeonGenerator.c pathfinding.c heap.c monster.c main.c -o rlg327 -lm -lcurses
 
 clean:
 	rm rlg327

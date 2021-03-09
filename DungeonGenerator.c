@@ -5,6 +5,7 @@
 #include <math.h>
 #include <unistd.h>
 #include "endian.h"
+#include <ncurses.h>
 
 #include "dungeondefinitions.h"
 
@@ -18,57 +19,7 @@ int load();
 
 int writetodisk();
 
-int main(int argc, char const *argv[])
-{
-    int boolsave = 0;
-    int boolload = 0;
-    int nummon = 10;
-    for (int i = 1; i < argc; i++)
-    {
-        if (strcmp(argv[i], "--save") == 0)
-        {
-            boolsave = 1;
-        }
-        else if (strcmp(argv[i], "--load") == 0)
-        {
-            boolload = 1;
-        }
-        else if (strcmp(argv[i], "--nummon") == 0)
-        {
-            nummon = (int)strtol(argv[i + 1], NULL, 10);
-            i++;
-        }
-    }
 
-    if (boolload == 1)
-    {
-        load();
-    }
-    else
-    {
-        generate();
-    }
-
-    dungeon.PC.alive = 1;
-    dungeon.PC.nextturn = 0;
-    dungeon.PC.sequencenumber = 0;
-    dungeon.PC.speed = 10;
-    dungeon.PC.to_string = '@';
-    dungeon.PC.isNPC = 0;
-
-    dungeon_type *d;
-    d = &dungeon;
-    printDungeon(d);
-
-    if (boolsave == 1)
-    {
-        writetodisk();
-    }
-
-    init_monsters(d, nummon);
-    run_game(d);
-
-}
 
 int generate()
 {
@@ -499,7 +450,7 @@ void printDungeon(dungeon_type *d)
 {
 
 
-    printf("\n");
+
 
     for (int i = 0; i < DUNGEON_Y; i++)
     {
@@ -511,7 +462,7 @@ void printDungeon(dungeon_type *d)
             {
                 if (d->monsters[k].pos.y == i && d->monsters[k].pos.x == j && d->monsters[k].alive)
                 {
-                    printf("%c", d->monsters[k].to_string);
+                    mvaddch(i+1,j, d->monsters[k].to_string);
                     out = 1;
                     break;
                 }
@@ -520,32 +471,31 @@ void printDungeon(dungeon_type *d)
                 continue;
             if (d->PC.pos.y == i && d->PC.pos.x == j)
             {
-                printf("@");
+                mvaddch(i+1,j, '@');
             }
             else if (d->map[i][j].type == ROCK)
             {
-                printf(" ");
+                mvaddch(i+1,j, ' ');
             }
             else if (d->map[i][j].type == ROOM)
             {
-                printf(".");
+                mvaddch(i+1,j, '.');
             }
             else if (d->map[i][j].type == CORRIDOR)
             {
-                printf("#");
+                mvaddch(i+1,j, '#');
             }
             else if (d->map[i][j].type == UP)
             {
-                printf("<");
+                mvaddch(i+1,j, '<');
             }
             else if (d->map[i][j].type == DOWN)
             {
-                printf(">");
+                mvaddch(i+1,j, '>');
             }
         }
-        printf("\n");
+
     }
 
 
-    printf("\n");
 }
