@@ -8,7 +8,7 @@
 
 #include "dungeondefinitions.h"
 
-dungeon_type dungeon;
+extern dungeon_type dungeon;
 
 void printDungeon(dungeon_type *d);
 

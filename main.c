@@ -243,30 +243,37 @@ int player_turn(dungeon_type *d)
             }
             for (int i = (curPage - 1) * 22; i < nummon && i < 22 * curPage; i++)
             {
-                int Ydistance = d->PC.pos.y - d->monsters[i].pos.y;
-                int Xdistance = d->PC.pos.x - d->monsters[i].pos.x;
-                char NS[6];
-                char WE[5];
-                if (Ydistance < 0)
+                if (d->monsters[i].alive == 1)
                 {
-                    sprintf(NS, "south");
-                    Ydistance = Ydistance * -1;
-                }
-                else
-                {
-                    sprintf(NS, "north");
-                }
+                    int Ydistance = d->PC.pos.y - d->monsters[i].pos.y;
+                    int Xdistance = d->PC.pos.x - d->monsters[i].pos.x;
+                    char NS[6];
+                    char WE[5];
+                    if (Ydistance < 0)
+                    {
+                        sprintf(NS, "south");
+                        Ydistance = Ydistance * -1;
+                    }
+                    else
+                    {
+                        sprintf(NS, "north");
+                    }
 
-                if (Xdistance < 0)
-                {
-                    sprintf(WE, "east");
-                    Xdistance = Xdistance * -1;
+                    if (Xdistance < 0)
+                    {
+                        sprintf(WE, "east");
+                        Xdistance = Xdistance * -1;
+                    }
+                    else
+                    {
+                        sprintf(WE, "west");
+                    }
+                    sprintf(monster_string, "%c, %d %s and %d %s", d->monsters[i].to_string, Ydistance, NS, Xdistance, WE);
                 }
                 else
                 {
-                    sprintf(WE, "west");
+                    sprintf(monster_string, "%c, dead", d->monsters[i].to_string);
                 }
-                sprintf(monster_string, "%c, %d %s and %d %s", d->monsters[i].to_string, Ydistance, NS, Xdistance, WE);
 
                 for (int j = 0; j < strlen(monster_string); j++)
                 {
