@@ -104,7 +104,7 @@ void movemonsternontunneling(dungeon_type *d, monster *m);
 void move_monster_tunneling(dungeon_type *d, monster *m);
 void run_game(dungeon_type *d);
 void printDungeon(dungeon_type *d);
-int generate();
+dungeon_type generate();
 
 int load();
 

@@ -1,4 +1,24 @@
 # cs-327-rogue-game by David bone
+## Assignment 1.05
+
+I have now added user input into the dungeon game. I have added all Keys that were specified.
+The terminal output is now using Ncurses rather than stdio. This took some reworking of my print dungeon method but in the end, it worked out really well
+
+If a key is pressed that is not one specified, the turn is saved and the header prompts the user that the input was not recognized. This goes for the main screen, not the monster list screen.
+
+I have used the header to tell the user what action has just taken place. The bottom two lines on the dungeon screen are place holders for future assignments.
+
+NOTE: I have not updated the save or load features, per Professor Sheaffer's instruction
+
+USAGE:
+
+    >make
+    > ./rlg327 --nummon <desired integer of monsters>
+
+Tested on Ubuntu
+
+Halfway there!! (with assignment 1 at least...)
+
 
 ## Assignment 1.04
 

@@ -13,7 +13,7 @@ dungeon_type dungeon;
 
 void printDungeon(dungeon_type *d);
 
-int generate();
+dungeon_type generate();
 
 int load();
 
@@ -21,7 +21,7 @@ int writetodisk();
 
 
 
-int generate()
+dungeon_type generate()
 {
     int seed = (unsigned)time(NULL);
     srand(seed);
@@ -206,7 +206,7 @@ int generate()
             break;
         }
     }
-    return 0;
+    return dungeon;
 }
 
 int load()
