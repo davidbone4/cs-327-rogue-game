@@ -66,3 +66,14 @@
     => Updated CHANGELOG.md and README.md
     => Tested on Ubuntu
     => Turned in Assignment1.04
+3/7/2021
+    => Removed border around dungeon display (finally)
+3/8/2021
+    => added ncurses into my project
+    => rewrote my printdungeon to output with ncurses
+    => added logic to move the player with the given keys
+3/9/2021
+    => added support to go up and down staircases and to generate a new dungeon each time
+    => added rest and quit features
+    => added monster list
+    => created paginator for the monster list and added keys to control it

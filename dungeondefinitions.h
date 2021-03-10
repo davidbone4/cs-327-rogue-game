@@ -97,10 +97,15 @@ typedef enum
     TELEPATHY,
     INTELLIGENCE
 }behavior;
-void init_monsters(dungeon_type *d, int numMonsters);
+heap_t init_monsters(dungeon_type *d, int numMonsters);
 void nontunnel_path_finder(dungeon_type *d, int ystart, int xstart);
 void tunnel_path_finder(dungeon_type *d, int ystart, int xstart);
 void movemonsternontunneling(dungeon_type *d, monster *m);
 void move_monster_tunneling(dungeon_type *d, monster *m);
 void run_game(dungeon_type *d);
 void printDungeon(dungeon_type *d);
+dungeon_type generate();
+
+int load();
+
+int writetodisk();

@@ -19,7 +19,8 @@ void movemonsternontunneling(dungeon_type *d, monster *m);
 void move_monster_tunneling(dungeon_type *d, monster *m);
 void run_game(dungeon_type *d);
 char *printmonster(monster *m);
-void init_monsters(dungeon_type *d, int numMonsters)
+
+heap_t init_monsters(dungeon_type *d, int numMonsters)
 {
     int seed = (unsigned) time(NULL);
     srand(seed);
@@ -58,7 +59,7 @@ void init_monsters(dungeon_type *d, int numMonsters)
         {
             int Y = (rand() % (DUNGEON_Y - 1)) + 1;
             int X = (rand() % (DUNGEON_X - 1)) + 1;
-            if ((d->map[Y][X].type == ROOM || d->map[Y][X].type == CORRIDOR) && !(d->PC.pos.y == Y && d->PC.pos.x == X))
+            if ((d->map[Y][X].type == ROOM || d->map[Y][X].type == CORRIDOR) && 25 < (pow(Y - d->PC.pos.y, 2) + pow(X - d->PC.pos.x, 2)))
             {
                 monsters[i].pos.y = Y;
                 monsters[i].pos.x = X;
@@ -71,42 +72,8 @@ void init_monsters(dungeon_type *d, int numMonsters)
 
     d->monsters = monsters;
     d->num_monsters = numMonsters;
-}
 
-void run_game(dungeon_type *d)
-{
-
-    static monster *c;
-    while ((c = heap_remove_min(&h)))
-    {
-
-        if (c->isNPC == 0)
-        {
-
-            printDungeon(d);
-            usleep(1000000);
-            if (c->alive == 0)
-            {
-                break;
-            }
-        }
-        else if (c->type[TUNNELING] == '1')
-        {
-            move_monster_tunneling(d, c);
-        }
-        else
-        {
-            movemonsternontunneling(d, c);
-        }
-
-        c->nextturn = c->nextturn + (1000 / c->speed);
-        if (c->alive == 1)
-        {
-            c->hn = heap_insert(&h, c);
-        }
-    }
-
-    printf("Game OVER! You died. \n");
+    return h;
 }
 
 static int32_t monster_cmp(const void *key, const void *with)
