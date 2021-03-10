@@ -8,7 +8,7 @@
 
 #include "dungeondefinitions.h"
 
-heap_t h;
+extern heap_t h;
 
 char *hextobinary(int num);
 
