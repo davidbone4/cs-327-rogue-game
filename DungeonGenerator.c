@@ -5,7 +5,7 @@
 #include <math.h>
 #include <endian.h>
 #include <unistd.h>
-#include <ncurses.h>
+
 #include "dungeondefinitions.h"
 
 dungeon_type dungeon;

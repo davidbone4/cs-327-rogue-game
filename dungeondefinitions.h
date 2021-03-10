@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <ncurses.h>
 #include "heap.h"
 
 #define DUNGEON_X 80

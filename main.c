@@ -5,7 +5,6 @@
 #include <time.h>
 #include <unistd.h>
 #include <math.h>
-#include <ncurses.h>
 
 #include "dungeondefinitions.h"
 
