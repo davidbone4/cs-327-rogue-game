@@ -4,7 +4,6 @@
 #include <time.h>
 #include <math.h>
 #include <unistd.h>
-#include "endian.h"
 
 #include "dungeondefinitions.h"
 
