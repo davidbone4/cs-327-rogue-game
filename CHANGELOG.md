@@ -81,3 +81,9 @@
     => ported to C++
     => changed make file
     => changed structs to classes and separated npc and pc classes
+    => implemented fog of war
+    => implemented new fog print method and fog toggle
+    => created teleportation method
+    => added random toggle in teleportation method
+    => Tested on Ubuntu
+    => Turned in Assignment 1.06
