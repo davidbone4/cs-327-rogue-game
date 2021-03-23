@@ -12,11 +12,11 @@ extern heap_t h;
 
 const char *hextobinary(int num);
 
-int islineofsight(dungeon_type *d, monster *m, position pc);
+int islineofsight(dungeon_type *d, npc *m, position pc);
 static int32_t monster_cmp(const void *key, const void *with);
 
-void movemonsternontunneling(dungeon_type *d, monster *m);
-void move_monster_tunneling(dungeon_type *d, monster *m);
+void movemonsternontunneling(dungeon_type *d, npc *m);
+void move_monster_tunneling(dungeon_type *d, npc *m);
 void run_game(dungeon_type *d);
 
 heap_t init_monsters(dungeon_type *d, int numMonsters)
@@ -29,7 +29,7 @@ heap_t init_monsters(dungeon_type *d, int numMonsters)
 
     d->PC.hn = heap_insert(&h, &(d->PC));
 
-    monster *monsters = (monster *) malloc(numMonsters * sizeof(monster));
+    npc *monsters = (npc *) malloc(numMonsters * sizeof(npc));
 
     for (int i = 0; i < numMonsters; i++)
     {
@@ -77,20 +77,20 @@ heap_t init_monsters(dungeon_type *d, int numMonsters)
 
 static int32_t monster_cmp(const void *key, const void *with)
 {
-    int32_t out = ((monster *)key)->nextturn - ((monster *)with)->nextturn;
+    int32_t out = ((character *)key)->nextturn - ((character *)with)->nextturn;
     if (out != 0)
     {
         return out;
     }
     else
     {
-        out = ((monster *)key)->sequencenumber - ((monster *)with)->sequencenumber;
+        out = ((character *)key)->sequencenumber - ((character *)with)->sequencenumber;
     }
 
     return out;
 }
 
-void movemonsternontunneling(dungeon_type *d, monster *m)
+void movemonsternontunneling(dungeon_type *d, npc *m)
 {
     uint8_t nextY = m->pos.y;
     uint8_t nextX = m->pos.x;
@@ -277,7 +277,7 @@ void movemonsternontunneling(dungeon_type *d, monster *m)
     }
 }
 
-void move_monster_tunneling(dungeon_type *d, monster *m)
+void move_monster_tunneling(dungeon_type *d, npc *m)
 {
     uint8_t nextY = m->pos.y;
     uint8_t nextX = m->pos.x;
@@ -550,7 +550,7 @@ const char *hextobinary(int num)
     return "0000";
 }
 
-int islineofsight(dungeon_type *d, monster *m, position pc)
+int islineofsight(dungeon_type *d, npc *m, position pc)
 {
 
     uint8_t y = m->pos.y;

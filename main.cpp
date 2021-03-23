@@ -46,7 +46,6 @@ int main(int argc, char const *argv[])
     dungeon.PC.nextturn = 0;
     dungeon.PC.sequencenumber = 0;
     dungeon.PC.speed = 10;
-    dungeon.PC.to_string = '@';
     dungeon.PC.isNPC = 0;
 
     dungeon_type *d;
@@ -64,8 +63,8 @@ int main(int argc, char const *argv[])
 void run_game(dungeon_type *d)
 {
 
-    static monster *c;
-    while ((c = (monster *)heap_remove_min(&h)))
+    static npc *c;
+    while ((c = (npc *) heap_remove_min(&h)))
     {
 
         if (c->isNPC == 0)
