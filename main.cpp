@@ -493,14 +493,8 @@ void teleportPC(dungeon_type *d)
             break;
         case 'r':
 
-            newPos.x = rand() % DUNGEON_X;
-            newPos.y = rand() % DUNGEON_Y;
-
-            while (d->map[newPos.x][newPos.y].hardness == 255)
-            {
-                newPos.x = rand() % DUNGEON_X;
-                newPos.y = rand() % DUNGEON_Y;
-            }
+            newPos.x = rand() % (DUNGEON_X-1)+1;
+            newPos.y = rand() % (DUNGEON_Y-1)+1;
             out = 1;
             break;
         }
