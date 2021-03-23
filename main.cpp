@@ -40,14 +40,7 @@ int main(int argc, char const *argv[])
         }
     }
 
-    if (boolload == 1)
-    {
-        load();
-    }
-    else
-    {
-        generate();
-    }
+    generate();
 
     dungeon.PC.alive = 1;
     dungeon.PC.nextturn = 0;
@@ -59,13 +52,8 @@ int main(int argc, char const *argv[])
     dungeon_type *d;
     d = &dungeon;
 
-    if (boolsave == 1)
-    {
-        writetodisk();
-    }
-
     h = init_monsters(d, nummon);
-    char *header = "Welcome to David Bone's cs327 project!";
+    const char *header = "Welcome to David Bone's cs327 project!";
     for (int i = 0; i < strlen(header); i++)
     {
         mvaddch(0, i, header[i]);
@@ -77,7 +65,7 @@ void run_game(dungeon_type *d)
 {
 
     static monster *c;
-    while ((c = heap_remove_min(&h)))
+    while ((c = (monster *)heap_remove_min(&h)))
     {
 
         if (c->isNPC == 0)
@@ -117,7 +105,7 @@ int player_turn(dungeon_type *d)
     int out = 1;
     printDungeon(d);
 
-    char *placeholder = "placeholder";
+    const char *placeholder = "placeholder";
     for (int i = 0; i < strlen(placeholder); i++)
     {
         mvaddch(22, i, placeholder[i]);
@@ -355,7 +343,7 @@ void io_init_terminal(void)
 
 void end_game()
 {
-    char *closing = "Game OVER! You died. Press any button to continue";
+    const char *closing = "Game OVER! You died. Press any button to continue";
 
     for (int i = 0; i < strlen(closing); i++)
     {

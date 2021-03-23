@@ -56,7 +56,7 @@ typedef struct monster
     heap_node_t *hn;
     int speed;
     char to_string;
-    char* type;
+    const char * type;
     position pos;
     int nextturn;
     int sequencenumber;
@@ -87,10 +87,6 @@ typedef struct corridor_path
     uint32_t cost;
 } path_data;
 
-
-
-
-
 typedef enum
 {
     ERRATIC,
@@ -98,6 +94,7 @@ typedef enum
     TELEPATHY,
     INTELLIGENCE
 }behavior;
+
 heap_t init_monsters(dungeon_type *d, int numMonsters);
 void nontunnel_path_finder(dungeon_type *d, int ystart, int xstart);
 void tunnel_path_finder(dungeon_type *d, int ystart, int xstart);
@@ -106,7 +103,3 @@ void move_monster_tunneling(dungeon_type *d, monster *m);
 void run_game(dungeon_type *d);
 void printDungeon(dungeon_type *d);
 dungeon_type generate();
-
-int load();
-
-int writetodisk();

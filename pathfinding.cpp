@@ -95,7 +95,7 @@ void nontunnel_path_finder(dungeon_type *d, int ystart, int xstart)
         }
     }
 
-    while ((c = heap_remove_min(&h)))
+    while ((c = (path_t *) heap_remove_min(&h)))
     {
         c->hn = NULL;
         if ((p[c->pos[dim_y] - 1][c->pos[dim_x] - 1].hn) &&
@@ -214,7 +214,7 @@ void tunnel_path_finder(dungeon_type *d, int ystart, int xstart)
   }
 
   size = h.size;
-  while ((c = heap_remove_min(&h))) {
+  while ((c = (path_t*) heap_remove_min(&h))) {
     if (--size != h.size) {
       exit(1);
     }

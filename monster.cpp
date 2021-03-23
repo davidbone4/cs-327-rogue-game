@@ -10,7 +10,7 @@
 
 extern heap_t h;
 
-char *hextobinary(int num);
+const char *hextobinary(int num);
 
 int islineofsight(dungeon_type *d, monster *m, position pc);
 static int32_t monster_cmp(const void *key, const void *with);
@@ -18,7 +18,6 @@ static int32_t monster_cmp(const void *key, const void *with);
 void movemonsternontunneling(dungeon_type *d, monster *m);
 void move_monster_tunneling(dungeon_type *d, monster *m);
 void run_game(dungeon_type *d);
-char *printmonster(monster *m);
 
 heap_t init_monsters(dungeon_type *d, int numMonsters)
 {
@@ -30,7 +29,7 @@ heap_t init_monsters(dungeon_type *d, int numMonsters)
 
     d->PC.hn = heap_insert(&h, &(d->PC));
 
-    monster *monsters = malloc(numMonsters * sizeof(monster));
+    monster *monsters = (monster *) malloc(numMonsters * sizeof(monster));
 
     for (int i = 0; i < numMonsters; i++)
     {
@@ -336,7 +335,7 @@ void move_monster_tunneling(dungeon_type *d, monster *m)
             }
         }
 
-        if (d->map[shortestY][shortestX].type < 255)
+        if (d->map[shortestY][shortestX].hardness < 255)
         {
             nextY = shortestY;
             nextX = shortestX;
@@ -410,7 +409,7 @@ void move_monster_tunneling(dungeon_type *d, monster *m)
                 }
             }
 
-            if (d->map[shortestY][shortestX].type < 255)
+            if (d->map[shortestY][shortestX].hardness < 255)
             {
                 nextY = shortestY;
                 nextX = shortestX;
@@ -480,7 +479,7 @@ void move_monster_tunneling(dungeon_type *d, monster *m)
     }
 }
 
-char *hextobinary(int num)
+const char *hextobinary(int num)
 {
 
     switch (num)
@@ -599,8 +598,3 @@ int islineofsight(dungeon_type *d, monster *m, position pc)
     }
     return 1;
 }
-
-// char *printmonster(monster *m)
-// {
-//     return &(m->to_string);
-// }
