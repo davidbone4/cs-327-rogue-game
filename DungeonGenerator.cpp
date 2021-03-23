@@ -12,17 +12,15 @@ extern dungeon_type dungeon;
 
 void printDungeon(dungeon_type *d);
 
-dungeon_type generate();
+dungeon_type generate(int seed);
 
 int load();
 
 int writetodisk();
 
-
-
-dungeon_type generate()
+dungeon_type generate(int seed)
 {
-    int seed = (unsigned)time(NULL);
+
     srand(seed);
     // printf("generate seed: %d\n", seed);
 
@@ -211,9 +209,6 @@ dungeon_type generate()
 void printDungeon(dungeon_type *d)
 {
 
-
-
-
     for (int i = 0; i < DUNGEON_Y; i++)
     {
 
@@ -224,7 +219,7 @@ void printDungeon(dungeon_type *d)
             {
                 if (d->monsters[k].pos.y == i && d->monsters[k].pos.x == j && d->monsters[k].alive)
                 {
-                    mvaddch(i+1,j, d->monsters[k].to_string);
+                    mvaddch(i + 1, j, d->monsters[k].to_string);
                     out = 1;
                     break;
                 }
@@ -233,31 +228,28 @@ void printDungeon(dungeon_type *d)
                 continue;
             if (d->PC.pos.y == i && d->PC.pos.x == j)
             {
-                mvaddch(i+1,j, '@');
+                mvaddch(i + 1, j, '@');
             }
             else if (d->map[i][j].type == ROCK)
             {
-                mvaddch(i+1,j, ' ');
+                mvaddch(i + 1, j, ' ');
             }
             else if (d->map[i][j].type == ROOM)
             {
-                mvaddch(i+1,j, '.');
+                mvaddch(i + 1, j, '.');
             }
             else if (d->map[i][j].type == CORRIDOR)
             {
-                mvaddch(i+1,j, '#');
+                mvaddch(i + 1, j, '#');
             }
             else if (d->map[i][j].type == UP)
             {
-                mvaddch(i+1,j, '<');
+                mvaddch(i + 1, j, '<');
             }
             else if (d->map[i][j].type == DOWN)
             {
-                mvaddch(i+1,j, '>');
+                mvaddch(i + 1, j, '>');
             }
         }
-
     }
-
-
 }

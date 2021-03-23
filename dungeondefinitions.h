@@ -24,10 +24,11 @@ typedef enum
     DOWN
 } cellState;
 
-typedef enum dim {
-  dim_x,
-  dim_y,
-  num_dims
+typedef enum dim
+{
+    dim_x,
+    dim_y,
+    num_dims
 } dim_t;
 
 typedef struct positions
@@ -50,10 +51,9 @@ typedef struct room8bit
     uint8_t ySize;
 } room8bit;
 
-
 typedef class character
 {
-    public:
+public:
     heap_node_t *hn;
     int speed;
     position pos;
@@ -61,38 +61,34 @@ typedef class character
     int sequencenumber;
     int alive;
     int isNPC;
-}character;
+} character;
 
-typedef class npc: public character
+typedef class npc : public character
 {
-    public:
+public:
     char to_string;
-    const char * type;
+    const char *type;
     position memory;
-}npc;
+} npc;
 
-typedef class pc: public character
+typedef class pc : public character
 {
-    public:
+public:
     cell map[DUNGEON_Y][DUNGEON_X];
-}pc;
-
+} pc;
 
 typedef class dungeon
 {
-    public:
+public:
     cell map[DUNGEON_Y][DUNGEON_X];
     room8bit rooms[MAX_ROOMS];
     uint16_t num_rooms;
-    npc * monsters;
+    npc *monsters;
     int num_monsters;
     pc PC;
     uint8_t distance[DUNGEON_Y][DUNGEON_X];
     uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
 } dungeon_type;
-
-
-
 
 typedef struct corridor_path
 {
@@ -107,7 +103,7 @@ typedef enum
     TUNNELING,
     TELEPATHY,
     INTELLIGENCE
-}behavior;
+} behavior;
 
 heap_t init_monsters(dungeon_type *d, int numMonsters);
 void nontunnel_path_finder(dungeon_type *d, int ystart, int xstart);
@@ -116,4 +112,5 @@ void movemonsternontunneling(dungeon_type *d, npc *m);
 void move_monster_tunneling(dungeon_type *d, npc *m);
 void run_game(dungeon_type *d);
 void printDungeon(dungeon_type *d);
-dungeon_type generate();
+dungeon_type generate(int seed);
+int islineofsight(dungeon_type *d, uint8_t y, uint8_t x, position pc);

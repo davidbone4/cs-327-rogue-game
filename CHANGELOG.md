@@ -77,3 +77,7 @@
     => added rest and quit features
     => added monster list
     => created paginator for the monster list and added keys to control it
+3/22/2021
+    => ported to C++
+    => changed make file
+    => changed structs to classes and separated npc and pc classes
