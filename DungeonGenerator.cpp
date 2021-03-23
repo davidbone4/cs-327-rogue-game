@@ -3,7 +3,6 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
-#include <endian.h>
 #include <unistd.h>
 
 #include "dungeondefinitions.h"
