@@ -10,19 +10,18 @@
 
 extern heap_t h;
 
-char *hextobinary(int num);
+const char *hextobinary(int num);
 
-int islineofsight(dungeon_type *d, monster *m, position pc);
+int islineofsight(dungeon_type *d, uint8_t y, uint8_t x, position pc);
 static int32_t monster_cmp(const void *key, const void *with);
 
-void movemonsternontunneling(dungeon_type *d, monster *m);
-void move_monster_tunneling(dungeon_type *d, monster *m);
+void movemonsternontunneling(dungeon_type *d, npc *m);
+void move_monster_tunneling(dungeon_type *d, npc *m);
 void run_game(dungeon_type *d);
-char *printmonster(monster *m);
 
 heap_t init_monsters(dungeon_type *d, int numMonsters)
 {
-    int seed = (unsigned) time(NULL);
+    int seed = (unsigned)time(NULL);
     srand(seed);
     // printf("monster seed: %d\n", seed);
 
@@ -30,7 +29,7 @@ heap_t init_monsters(dungeon_type *d, int numMonsters)
 
     d->PC.hn = heap_insert(&h, &(d->PC));
 
-    monster *monsters = malloc(numMonsters * sizeof(monster));
+    npc *monsters = (npc *)malloc(numMonsters * sizeof(npc));
 
     for (int i = 0; i < numMonsters; i++)
     {
@@ -78,20 +77,20 @@ heap_t init_monsters(dungeon_type *d, int numMonsters)
 
 static int32_t monster_cmp(const void *key, const void *with)
 {
-    int32_t out = ((monster *)key)->nextturn - ((monster *)with)->nextturn;
+    int32_t out = ((character *)key)->nextturn - ((character *)with)->nextturn;
     if (out != 0)
     {
         return out;
     }
     else
     {
-        out = ((monster *)key)->sequencenumber - ((monster *)with)->sequencenumber;
+        out = ((character *)key)->sequencenumber - ((character *)with)->sequencenumber;
     }
 
     return out;
 }
 
-void movemonsternontunneling(dungeon_type *d, monster *m)
+void movemonsternontunneling(dungeon_type *d, npc *m)
 {
     uint8_t nextY = m->pos.y;
     uint8_t nextX = m->pos.x;
@@ -157,7 +156,7 @@ void movemonsternontunneling(dungeon_type *d, monster *m)
     }
     else if (m->type[INTELLIGENCE] == '1')
     {
-        if (islineofsight(d, m, d->PC.pos))
+        if (islineofsight(d, m->pos.y, m->pos.x, d->PC.pos))
         {
             m->memory.y = d->PC.pos.y;
             m->memory.x = d->PC.pos.x;
@@ -189,7 +188,7 @@ void movemonsternontunneling(dungeon_type *d, monster *m)
     else
     {
 
-        if (islineofsight(d, m, d->PC.pos))
+        if (islineofsight(d, m->pos.y, m->pos.x, d->PC.pos))
         {
             m->memory.y = d->PC.pos.y;
             m->memory.x = d->PC.pos.x;
@@ -278,7 +277,7 @@ void movemonsternontunneling(dungeon_type *d, monster *m)
     }
 }
 
-void move_monster_tunneling(dungeon_type *d, monster *m)
+void move_monster_tunneling(dungeon_type *d, npc *m)
 {
     uint8_t nextY = m->pos.y;
     uint8_t nextX = m->pos.x;
@@ -336,7 +335,7 @@ void move_monster_tunneling(dungeon_type *d, monster *m)
             }
         }
 
-        if (d->map[shortestY][shortestX].type < 255)
+        if (d->map[shortestY][shortestX].hardness < 255)
         {
             nextY = shortestY;
             nextX = shortestX;
@@ -344,7 +343,7 @@ void move_monster_tunneling(dungeon_type *d, monster *m)
     }
     else if (m->type[INTELLIGENCE] == '1')
     {
-        if (islineofsight(d, m, d->PC.pos))
+        if (islineofsight(d, m->pos.y, m->pos.x, d->PC.pos))
         {
             m->memory.y = d->PC.pos.y;
             m->memory.x = d->PC.pos.x;
@@ -376,7 +375,7 @@ void move_monster_tunneling(dungeon_type *d, monster *m)
     else
     {
 
-        if (islineofsight(d, m, d->PC.pos))
+        if (islineofsight(d, m->pos.y, m->pos.x, d->PC.pos))
         {
             m->memory.y = d->PC.pos.y;
             m->memory.x = d->PC.pos.x;
@@ -410,7 +409,7 @@ void move_monster_tunneling(dungeon_type *d, monster *m)
                 }
             }
 
-            if (d->map[shortestY][shortestX].type < 255)
+            if (d->map[shortestY][shortestX].hardness < 255)
             {
                 nextY = shortestY;
                 nextX = shortestX;
@@ -480,7 +479,7 @@ void move_monster_tunneling(dungeon_type *d, monster *m)
     }
 }
 
-char *hextobinary(int num)
+const char *hextobinary(int num)
 {
 
     switch (num)
@@ -551,11 +550,8 @@ char *hextobinary(int num)
     return "0000";
 }
 
-int islineofsight(dungeon_type *d, monster *m, position pc)
+int islineofsight(dungeon_type *d, uint8_t y, uint8_t x, position pc)
 {
-
-    uint8_t y = m->pos.y;
-    uint8_t x = m->pos.x;
 
     while (1)
     {
@@ -599,8 +595,3 @@ int islineofsight(dungeon_type *d, monster *m, position pc)
     }
     return 1;
 }
-
-// char *printmonster(monster *m)
-// {
-//     return &(m->to_string);
-// }

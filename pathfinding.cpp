@@ -9,8 +9,8 @@
 
 static dungeon_type *dungeon;
 
-#define tunnel_movement_cost(x, y)                      \
-  ((d->map[y][x].hardness / 85) + 1)
+#define tunnel_movement_cost(x, y) \
+    ((d->map[y][x].hardness / 85) + 1)
 typedef struct path
 {
     heap_node_t *hn;
@@ -42,17 +42,16 @@ static int32_t dist_cmp(const void *key, const void *with)
                                       [((path_t *)with)->pos[dim_x]]);
 }
 
-static int32_t tunnel_cmp(const void *key, const void *with) {
-  return ((int32_t) dungeon->pc_tunnel[((path_t *) key)->pos[dim_y]]
-                                      [((path_t *) key)->pos[dim_x]] -
-          (int32_t) dungeon->pc_tunnel[((path_t *) with)->pos[dim_y]]
-                                      [((path_t *) with)->pos[dim_x]]);
+static int32_t tunnel_cmp(const void *key, const void *with)
+{
+    return ((int32_t)dungeon->pc_tunnel[((path_t *)key)->pos[dim_y]]
+                                       [((path_t *)key)->pos[dim_x]] -
+            (int32_t)dungeon->pc_tunnel[((path_t *)with)->pos[dim_y]]
+                                       [((path_t *)with)->pos[dim_x]]);
 }
 
 void nontunnel_path_finder(dungeon_type *d, int ystart, int xstart)
 {
-
-
 
     heap_t h;
     uint32_t x, y;
@@ -95,7 +94,7 @@ void nontunnel_path_finder(dungeon_type *d, int ystart, int xstart)
         }
     }
 
-    while ((c = heap_remove_min(&h)))
+    while ((c = (path_t *)heap_remove_min(&h)))
     {
         c->hn = NULL;
         if ((p[c->pos[dim_y] - 1][c->pos[dim_x] - 1].hn) &&
@@ -172,137 +171,153 @@ void nontunnel_path_finder(dungeon_type *d, int ystart, int xstart)
         }
     }
     heap_delete(&h);
-
-
 }
 
 void tunnel_path_finder(dungeon_type *d, int ystart, int xstart)
 {
 
-  heap_t h;
-  uint32_t x, y;
-  int size;
-  static path_t p[DUNGEON_Y][DUNGEON_X], *c;
-  static uint32_t initialized = 0;
+    heap_t h;
+    uint32_t x, y;
+    int size;
+    static path_t p[DUNGEON_Y][DUNGEON_X], *c;
+    static uint32_t initialized = 0;
 
-  if (!initialized) {
-    initialized = 1;
-    dungeon = d;
-    for (y = 0; y < DUNGEON_Y; y++) {
-      for (x = 0; x < DUNGEON_X; x++) {
-        p[y][x].pos[dim_y] = y;
-        p[y][x].pos[dim_x] = x;
-      }
+    if (!initialized)
+    {
+        initialized = 1;
+        dungeon = d;
+        for (y = 0; y < DUNGEON_Y; y++)
+        {
+            for (x = 0; x < DUNGEON_X; x++)
+            {
+                p[y][x].pos[dim_y] = y;
+                p[y][x].pos[dim_x] = x;
+            }
+        }
     }
-  }
 
-  for (y = 0; y < DUNGEON_Y; y++) {
-    for (x = 0; x < DUNGEON_X; x++) {
-      d->pc_tunnel[y][x] = 255;
+    for (y = 0; y < DUNGEON_Y; y++)
+    {
+        for (x = 0; x < DUNGEON_X; x++)
+        {
+            d->pc_tunnel[y][x] = 255;
+        }
     }
-  }
-  d->pc_tunnel[ystart][xstart] = 0;
+    d->pc_tunnel[ystart][xstart] = 0;
 
-  heap_init(&h, tunnel_cmp, NULL);
+    heap_init(&h, tunnel_cmp, NULL);
 
-  for (y = 0; y < DUNGEON_Y; y++) {
-    for (x = 0; x < DUNGEON_X; x++) {
-      if (d->map[y][x].hardness < 255) {
-        p[y][x].hn = heap_insert(&h, &p[y][x]);
-      }
+    for (y = 0; y < DUNGEON_Y; y++)
+    {
+        for (x = 0; x < DUNGEON_X; x++)
+        {
+            if (d->map[y][x].hardness < 255)
+            {
+                p[y][x].hn = heap_insert(&h, &p[y][x]);
+            }
+        }
     }
-  }
 
-  size = h.size;
-  while ((c = heap_remove_min(&h))) {
-    if (--size != h.size) {
-      exit(1);
+    size = h.size;
+    while ((c = (path_t *)heap_remove_min(&h)))
+    {
+        if (--size != h.size)
+        {
+            exit(1);
+        }
+        c->hn = NULL;
+        if ((p[c->pos[dim_y] - 1][c->pos[dim_x] - 1].hn) &&
+            (d->pc_tunnel[c->pos[dim_y] - 1][c->pos[dim_x] - 1] >
+             d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
+                 tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y])))
+        {
+            d->pc_tunnel[c->pos[dim_y] - 1][c->pos[dim_x] - 1] =
+                (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
+                 tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]));
+            heap_decrease_key_no_replace(&h,
+                                         p[c->pos[dim_y] - 1][c->pos[dim_x] - 1].hn);
+        }
+        if ((p[c->pos[dim_y] - 1][c->pos[dim_x]].hn) &&
+            (d->pc_tunnel[c->pos[dim_y] - 1][c->pos[dim_x]] >
+             d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
+                 tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y])))
+        {
+            d->pc_tunnel[c->pos[dim_y] - 1][c->pos[dim_x]] =
+                (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
+                 tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]));
+            heap_decrease_key_no_replace(&h,
+                                         p[c->pos[dim_y] - 1][c->pos[dim_x]].hn);
+        }
+        if ((p[c->pos[dim_y] - 1][c->pos[dim_x] + 1].hn) &&
+            (d->pc_tunnel[c->pos[dim_y] - 1][c->pos[dim_x] + 1] >
+             d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
+                 tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y])))
+        {
+            d->pc_tunnel[c->pos[dim_y] - 1][c->pos[dim_x] + 1] =
+                (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
+                 tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]));
+            heap_decrease_key_no_replace(&h,
+                                         p[c->pos[dim_y] - 1][c->pos[dim_x] + 1].hn);
+        }
+        if ((p[c->pos[dim_y]][c->pos[dim_x] - 1].hn) &&
+            (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x] - 1] >
+             d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
+                 tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y])))
+        {
+            d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x] - 1] =
+                (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
+                 tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]));
+            heap_decrease_key_no_replace(&h,
+                                         p[c->pos[dim_y]][c->pos[dim_x] - 1].hn);
+        }
+        if ((p[c->pos[dim_y]][c->pos[dim_x] + 1].hn) &&
+            (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x] + 1] >
+             d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
+                 tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y])))
+        {
+            d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x] + 1] =
+                (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
+                 tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]));
+            heap_decrease_key_no_replace(&h,
+                                         p[c->pos[dim_y]][c->pos[dim_x] + 1].hn);
+        }
+        if ((p[c->pos[dim_y] + 1][c->pos[dim_x] - 1].hn) &&
+            (d->pc_tunnel[c->pos[dim_y] + 1][c->pos[dim_x] - 1] >
+             d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
+                 tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y])))
+        {
+            d->pc_tunnel[c->pos[dim_y] + 1][c->pos[dim_x] - 1] =
+                (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
+                 tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]));
+            heap_decrease_key_no_replace(&h,
+                                         p[c->pos[dim_y] + 1][c->pos[dim_x] - 1].hn);
+        }
+        if ((p[c->pos[dim_y] + 1][c->pos[dim_x]].hn) &&
+            (d->pc_tunnel[c->pos[dim_y] + 1][c->pos[dim_x]] >
+             d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
+                 tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y])))
+        {
+            d->pc_tunnel[c->pos[dim_y] + 1][c->pos[dim_x]] =
+                (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
+                 tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]));
+            heap_decrease_key_no_replace(&h,
+                                         p[c->pos[dim_y] + 1][c->pos[dim_x]].hn);
+        }
+        if ((p[c->pos[dim_y] + 1][c->pos[dim_x] + 1].hn) &&
+            (d->pc_tunnel[c->pos[dim_y] + 1][c->pos[dim_x] + 1] >
+             d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
+                 tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y])))
+        {
+            d->pc_tunnel[c->pos[dim_y] + 1][c->pos[dim_x] + 1] =
+                (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
+                 tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]));
+            heap_decrease_key_no_replace(&h,
+                                         p[c->pos[dim_y] + 1][c->pos[dim_x] + 1].hn);
+        }
     }
-    c->hn = NULL;
-    if ((p[c->pos[dim_y] - 1][c->pos[dim_x] - 1].hn) &&
-        (d->pc_tunnel[c->pos[dim_y] - 1][c->pos[dim_x] - 1] >
-         d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
-         tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]))) {
-      d->pc_tunnel[c->pos[dim_y] - 1][c->pos[dim_x] - 1] =
-        (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
-         tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]));
-      heap_decrease_key_no_replace(&h,
-                                   p[c->pos[dim_y] - 1][c->pos[dim_x] - 1].hn);
-    }
-    if ((p[c->pos[dim_y] - 1][c->pos[dim_x]    ].hn) &&
-        (d->pc_tunnel[c->pos[dim_y] - 1][c->pos[dim_x]    ] >
-         d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
-         tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]))) {
-      d->pc_tunnel[c->pos[dim_y] - 1][c->pos[dim_x]    ] =
-        (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
-         tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]));
-      heap_decrease_key_no_replace(&h,
-                                   p[c->pos[dim_y] - 1][c->pos[dim_x]    ].hn);
-    }
-    if ((p[c->pos[dim_y] - 1][c->pos[dim_x] + 1].hn) &&
-        (d->pc_tunnel[c->pos[dim_y] - 1][c->pos[dim_x] + 1] >
-         d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
-         tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]))) {
-      d->pc_tunnel[c->pos[dim_y] - 1][c->pos[dim_x] + 1] =
-        (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
-         tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]));
-      heap_decrease_key_no_replace(&h,
-                                   p[c->pos[dim_y] - 1][c->pos[dim_x] + 1].hn);
-    }
-    if ((p[c->pos[dim_y]    ][c->pos[dim_x] - 1].hn) &&
-        (d->pc_tunnel[c->pos[dim_y]    ][c->pos[dim_x] - 1] >
-         d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
-         tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]))) {
-      d->pc_tunnel[c->pos[dim_y]    ][c->pos[dim_x] - 1] =
-        (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
-         tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]));
-      heap_decrease_key_no_replace(&h,
-                                   p[c->pos[dim_y]    ][c->pos[dim_x] - 1].hn);
-    }
-    if ((p[c->pos[dim_y]    ][c->pos[dim_x] + 1].hn) &&
-        (d->pc_tunnel[c->pos[dim_y]    ][c->pos[dim_x] + 1] >
-         d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
-         tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]))) {
-      d->pc_tunnel[c->pos[dim_y]    ][c->pos[dim_x] + 1] =
-        (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
-         tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]));
-      heap_decrease_key_no_replace(&h,
-                                   p[c->pos[dim_y]    ][c->pos[dim_x] + 1].hn);
-    }
-    if ((p[c->pos[dim_y] + 1][c->pos[dim_x] - 1].hn) &&
-        (d->pc_tunnel[c->pos[dim_y] + 1][c->pos[dim_x] - 1] >
-         d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
-         tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]))) {
-      d->pc_tunnel[c->pos[dim_y] + 1][c->pos[dim_x] - 1] =
-        (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
-         tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]));
-      heap_decrease_key_no_replace(&h,
-                                   p[c->pos[dim_y] + 1][c->pos[dim_x] - 1].hn);
-    }
-    if ((p[c->pos[dim_y] + 1][c->pos[dim_x]    ].hn) &&
-        (d->pc_tunnel[c->pos[dim_y] + 1][c->pos[dim_x]    ] >
-         d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
-         tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]))) {
-      d->pc_tunnel[c->pos[dim_y] + 1][c->pos[dim_x]    ] =
-        (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
-         tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]));
-      heap_decrease_key_no_replace(&h,
-                                   p[c->pos[dim_y] + 1][c->pos[dim_x]    ].hn);
-    }
-    if ((p[c->pos[dim_y] + 1][c->pos[dim_x] + 1].hn) &&
-        (d->pc_tunnel[c->pos[dim_y] + 1][c->pos[dim_x] + 1] >
-         d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
-         tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]))) {
-      d->pc_tunnel[c->pos[dim_y] + 1][c->pos[dim_x] + 1] =
-        (d->pc_tunnel[c->pos[dim_y]][c->pos[dim_x]] +
-         tunnel_movement_cost(c->pos[dim_x], c->pos[dim_y]));
-      heap_decrease_key_no_replace(&h,
-                                   p[c->pos[dim_y] + 1][c->pos[dim_x] + 1].hn);
-    }
-  }
-  heap_delete(&h);
+    heap_delete(&h);
 
-//   print_distance_map_tunnel(d,d->PC.pos.y,d->PC.pos.x);
+    //   print_distance_map_tunnel(d,d->PC.pos.y,d->PC.pos.x);
 }
 
 static int cellweight(int hardness)

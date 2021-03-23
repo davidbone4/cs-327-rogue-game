@@ -77,3 +77,13 @@
     => added rest and quit features
     => added monster list
     => created paginator for the monster list and added keys to control it
+3/22/2021
+    => ported to C++
+    => changed make file
+    => changed structs to classes and separated npc and pc classes
+    => implemented fog of war
+    => implemented new fog print method and fog toggle
+    => created teleportation method
+    => added random toggle in teleportation method
+    => Tested on Ubuntu
+    => Turned in Assignment 1.06

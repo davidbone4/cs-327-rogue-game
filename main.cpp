@@ -4,15 +4,18 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-#include <math.h>
+#include <cmath>
 
 #include "dungeondefinitions.h"
-
+int seed;
+int fog;
 heap_t h;
 dungeon_type dungeon;
 int nummon;
 
+void teleportPC(dungeon_type *d);
 int player_turn(dungeon_type *d);
+void printFogDungeon(dungeon_type *d);
 void io_init_terminal(void);
 void end_game();
 
@@ -40,32 +43,28 @@ int main(int argc, char const *argv[])
         }
     }
 
-    if (boolload == 1)
-    {
-        load();
-    }
-    else
-    {
-        generate();
-    }
+    seed = (unsigned)time(NULL);
+    generate(seed);
 
+    fog = 1;
     dungeon.PC.alive = 1;
     dungeon.PC.nextturn = 0;
     dungeon.PC.sequencenumber = 0;
     dungeon.PC.speed = 10;
-    dungeon.PC.to_string = '@';
     dungeon.PC.isNPC = 0;
+    for (int i = 0; i < DUNGEON_Y; i++)
+    {
+        for (int j = 0; j < DUNGEON_X; j++)
+        {
+            dungeon.PC.map[i][j].type = ROCK;
+        }
+    }
 
     dungeon_type *d;
     d = &dungeon;
 
-    if (boolsave == 1)
-    {
-        writetodisk();
-    }
-
     h = init_monsters(d, nummon);
-    char *header = "Welcome to David Bone's cs327 project!";
+    const char *header = "Welcome to David Bone's cs327 project!";
     for (int i = 0; i < strlen(header); i++)
     {
         mvaddch(0, i, header[i]);
@@ -76,8 +75,8 @@ int main(int argc, char const *argv[])
 void run_game(dungeon_type *d)
 {
 
-    static monster *c;
-    while ((c = heap_remove_min(&h)))
+    static npc *c;
+    while ((c = (npc *)heap_remove_min(&h)))
     {
 
         if (c->isNPC == 0)
@@ -115,9 +114,35 @@ int player_turn(dungeon_type *d)
 {
 
     int out = 1;
-    printDungeon(d);
+    int teleported = 0;
 
-    char *placeholder = "placeholder";
+    for (int i = d->PC.pos.y - 2; i <= d->PC.pos.y + 2; i++)
+    {
+        for (int j = d->PC.pos.x - 2; j <= d->PC.pos.x + 2; j++)
+        {
+
+            if (i < 0 || j < 0 || i >= DUNGEON_Y || j >= DUNGEON_X)
+            {
+                continue;
+            }
+
+            if (islineofsight(d, i, j, d->PC.pos))
+            {
+                d->PC.map[i][j].type = d->map[i][j].type;
+            }
+        }
+    }
+
+    if (fog)
+    {
+        printFogDungeon(d);
+    }
+    else
+    {
+        printDungeon(d);
+    }
+
+    const char *placeholder = "placeholder";
     for (int i = 0; i < strlen(placeholder); i++)
     {
         mvaddch(22, i, placeholder[i]);
@@ -185,7 +210,15 @@ int player_turn(dungeon_type *d)
         if (d->map[d->PC.pos.y][d->PC.pos.x].type == DOWN)
         {
             heap_delete(&h);
-            dungeon = generate();
+            seed = (unsigned)time(NULL);
+            dungeon = generate(seed);
+            for (int i = 0; i < DUNGEON_Y; i++)
+            {
+                for (int j = 0; j < DUNGEON_X; j++)
+                {
+                    dungeon.PC.map[i][j].type = ROCK;
+                }
+            }
             h = init_monsters(&dungeon, nummon);
             clear();
             sprintf(header, "Moved down the stairs.");
@@ -205,7 +238,16 @@ int player_turn(dungeon_type *d)
         if (d->map[d->PC.pos.y][d->PC.pos.x].type == UP)
         {
             heap_delete(&h);
-            generate();
+            seed = (unsigned)time(NULL);
+            dungeon = generate(seed);
+
+            for (int i = 0; i < DUNGEON_Y; i++)
+            {
+                for (int j = 0; j < DUNGEON_X; j++)
+                {
+                    dungeon.PC.map[i][j].type = ROCK;
+                }
+            }
             h = init_monsters(&dungeon, nummon);
             clear();
             sprintf(header, "Moved up the Stairs.");
@@ -316,12 +358,33 @@ int player_turn(dungeon_type *d)
         clear();
         endwin();
         exit(0);
+    case 't':
+
+        if (fog)
+        {
+            fog = 0;
+            sprintf(header, "Disabled Fog of War");
+        }
+        else
+        {
+            fog = 1;
+            sprintf(header, "Enabled Fog of War");
+        }
+
+        out = 0;
+        break;
+    case 'g':
+
+        teleportPC(d);
+        teleported = 1;
+        sprintf(header, "Teleported pc to (%d, %d)", d->PC.pos.y, d->PC.pos.x);
+        break;
     default:
         sprintf(header, "Unknown Key Input: %d", ch);
         out = 0;
         break;
     }
-    if (d->PC.pos.x != xNext || d->PC.pos.y != yNext)
+    if ((d->PC.pos.x != xNext || d->PC.pos.y != yNext) && !teleported)
     {
         if (d->map[yNext][xNext].type == ROCK)
         {
@@ -355,7 +418,7 @@ void io_init_terminal(void)
 
 void end_game()
 {
-    char *closing = "Game OVER! You died. Press any button to continue";
+    const char *closing = "Game OVER! You died. Press any button to continue";
 
     for (int i = 0; i < strlen(closing); i++)
     {
@@ -365,4 +428,146 @@ void end_game()
     int ch = getch();
     endwin();
     exit(0);
+}
+
+void teleportPC(dungeon_type *d)
+{
+    position newPos;
+    newPos.x = d->PC.pos.x;
+    newPos.y = d->PC.pos.y;
+
+    while (1)
+    {
+
+        printDungeon(d);
+        mvaddch(newPos.y + 1, newPos.x, '*');
+        refresh();
+        int ch = getch();
+
+        uint8_t yNext = newPos.y;
+        uint8_t xNext = newPos.x;
+        int out = 0;
+
+        switch (ch)
+        {
+        case '7':
+        case 'y':
+            yNext--;
+            xNext--;
+            break;
+        case '8':
+        case 'k':
+            yNext--;
+            break;
+        case '9':
+        case 'u':
+
+            yNext--;
+            xNext++;
+            break;
+        case '6':
+        case 'l':
+
+            xNext++;
+            break;
+        case '3':
+        case 'n':
+            yNext++;
+            xNext++;
+            break;
+        case '2':
+        case 'j':
+            yNext++;
+            break;
+        case '1':
+        case 'b':
+            yNext++;
+            xNext--;
+            break;
+        case '4':
+        case 'h':
+            xNext--;
+            break;
+        case 'g':
+            out = 1;
+            break;
+        case 'r':
+
+            newPos.x = rand() % DUNGEON_X;
+            newPos.y = rand() % DUNGEON_Y;
+
+            while (d->map[newPos.x][newPos.y].hardness == 255)
+            {
+                newPos.x = rand() % DUNGEON_X;
+                newPos.y = rand() % DUNGEON_Y;
+            }
+            out = 1;
+            break;
+        }
+
+        if (out)
+        {
+            break;
+        }
+
+        if ((xNext >= 0 && xNext < DUNGEON_X) && (yNext >= 0 && yNext < DUNGEON_Y) && d->map[yNext][xNext].hardness != 255)
+        {
+            newPos.x = xNext;
+            newPos.y = yNext;
+        }
+    }
+
+    d->PC.pos.x = newPos.x;
+    d->PC.pos.y = newPos.y;
+}
+
+void printFogDungeon(dungeon_type *d)
+{
+
+    for (int i = 0; i < DUNGEON_Y; i++)
+    {
+
+        for (int j = 0; j < DUNGEON_X; j++)
+        {
+
+            if (d->PC.pos.y == i && d->PC.pos.x == j)
+            {
+                mvaddch(i + 1, j, '@');
+            }
+            else if (d->PC.map[i][j].type == ROCK)
+            {
+                mvaddch(i + 1, j, ' ');
+            }
+            else if (d->PC.map[i][j].type == ROOM)
+            {
+                mvaddch(i + 1, j, '.');
+            }
+            else if (d->PC.map[i][j].type == CORRIDOR)
+            {
+                mvaddch(i + 1, j, '#');
+            }
+            else if (d->PC.map[i][j].type == UP)
+            {
+                mvaddch(i + 1, j, '<');
+            }
+            else if (d->PC.map[i][j].type == DOWN)
+            {
+                mvaddch(i + 1, j, '>');
+            }
+        }
+    }
+
+    for (int i = 0; i < nummon; i++)
+    {
+        int xDis = std::abs(d->monsters[i].pos.x - d->PC.pos.x);
+        int yDis = std::abs(d->monsters[i].pos.y - d->PC.pos.y);
+
+        if (xDis < 3 && yDis < 3)
+        {
+            if (islineofsight(d, d->monsters[i].pos.y, d->monsters[i].pos.x, d->PC.pos))
+            {
+                mvaddch(d->monsters[i].pos.y + 1, d->monsters[i].pos.x, d->monsters[i].to_string);
+            }
+        }
+    }
 }

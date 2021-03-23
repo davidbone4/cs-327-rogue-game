@@ -1,4 +1,20 @@
 # cs-327-rogue-game by David bone
+
+## Assignment 1.06
+
+There is now a default fog of war view in the game. This view is toggled by 't' during the players turn. You do not waste a turn to do this.
+
+There is also now now a teleportation key 'g' that activates a selection window, with the new location denoted with '*'. You are allowed to teleport into rock, but not immutable rock. If a rock is immutable, you will not be able to select it.
+
+Pressing 'r' while selecting a teleportation location will teleport the PC to a random non-immutable cell.
+
+USAGE:
+
+    >make
+    > ./rlg327 --nummon <desired integer of monsters>
+
+Tested on Ubuntu
+
 ## Assignment 1.05
 
 I have now added user input into the dungeon game. I have added all Keys that were specified.
