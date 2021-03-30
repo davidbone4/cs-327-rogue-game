@@ -19,7 +19,7 @@ void printFogDungeon(dungeon_type *d);
 void io_init_terminal(void);
 void end_game();
 
-int main(int argc, char const *argv[])
+void main_not(int argc, char const *argv[])
 {
     io_init_terminal();
 

@@ -87,3 +87,12 @@
     => added random toggle in teleportation method
     => Tested on Ubuntu
     => Turned in Assignment 1.06
+3/30/2021
+    => Temporarily disabled game main method
+    => added file reading
+    => added dictionary to test which keyword was being used
+    => implemented logic to skip an incomplete or a poorly formatted monster
+    => printed to terminal
+    => stored all monsters in a vector
+    => Tested on Ubuntu
+    => Turned in Assignment 1.07

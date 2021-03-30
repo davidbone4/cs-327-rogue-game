@@ -1,5 +1,22 @@
 # cs-327-rogue-game by David bone
 
+## Assignment 1.07
+
+This assignment consisted of parsing a text document for information on various monsters. I did not implement the optional Item definitions.
+
+When ran, the program searches for a file called "monster_desc.txt" in the home folder of this assignment, stores the data of all complete monsters in a vector, prints each to the terminal and exits.
+
+The order in which the program prints to terminal is inline with that of the table in the assignment PDF. (I noticed that this order was different that the order the example output was in, notably, the symbol parameter was out of place. I formatted my output against the table.)
+
+If a monster is missing a parameter or has more than one definition of a parameter, it is thrown out and the next monster is read.
+
+USAGE:
+
+    >make
+    > ./rlg327
+
+Tested on Ubuntu
+
 ## Assignment 1.06
 
 There is now a default fog of war view in the game. This view is toggled by 't' during the players turn. You do not waste a turn to do this.
