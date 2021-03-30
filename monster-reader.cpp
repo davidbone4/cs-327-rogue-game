@@ -57,10 +57,9 @@ int main(int argc, char const *argv[])
     int rarity = 0;
 
     string path = getenv("HOME");
-    path += "/.rlg327/monster_desc.text";
+    path += "/.rlg327/monster_desc.txt";
 
-    ifstream fr("/Users/davidbone/Library/Mobile Documents/com~apple~CloudDocs/School/spring 2021/repos for cs 327/monster_desc.txt"); //TODO CHANGEEE THISS
-                                                                                                                                       //TODO CHANGE
+    ifstream fr(path);
     string line;
 
     getline(fr, line);
