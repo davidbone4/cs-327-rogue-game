@@ -187,7 +187,7 @@ int main(int argc, char const *argv[])
                 getline(fr, line);
             }
 
-            if (name.empty() || description.empty() || color.empty() || speed_from_file.empty() || abilities.empty() || hp.empty() || dam.empty() || symbol == '\0' || rarity == 0 ||)
+            if (name.empty() || description.empty() || color.empty() || speed_from_file.empty() || abilities.empty() || hp.empty() || dam.empty() || symbol == '\0' || rarity == 0)
             {
                 out = true;
             }
