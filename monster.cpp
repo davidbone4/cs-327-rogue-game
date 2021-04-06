@@ -18,6 +18,40 @@ static int32_t monster_cmp(const void *key, const void *with);
 void movemonsternontunneling(dungeon_type *d, npc *m);
 void move_monster_tunneling(dungeon_type *d, npc *m);
 void run_game(dungeon_type *d);
+int rand_in_range(int min, int max);
+
+void npc::set(const std::string &name,
+              const std::string &description,
+              const char symbol,
+              const uint32_t &color,
+              const uint32_t &speed,
+              const uint32_t abilities,
+              const uint32_t &hitpoints,
+              const dice &damage,
+              const uint32_t rarity)
+{
+    this->name = name;
+    this->description = description;
+    this->to_string = symbol;
+    this->color = color;
+    this->speed_from_file = speed;
+    this->abilities = abilities;
+    this->hitpoints = hitpoints;
+    this->damage = damage;
+    this->rarity = rarity;
+
+}
+
+int rand_in_range(int min, int max)
+{
+    static bool first = true;
+    if (first)
+    {
+        srand(time(NULL)); //seeding for the first time only!
+        first = false;
+    }
+    return min + rand() % ((max + 1) - min);
+}
 
 heap_t init_monsters(dungeon_type *d, int numMonsters)
 {
@@ -29,30 +63,37 @@ heap_t init_monsters(dungeon_type *d, int numMonsters)
 
     d->PC.hn = heap_insert(&h, &(d->PC));
 
-    npc *monsters = (npc *)malloc(numMonsters * sizeof(npc));
+    npc *monsters = new npc[numMonsters];
 
     for (int i = 0; i < numMonsters; i++)
     {
-        monsters[i].speed = (rand() % 16) + 5;
-        int type = rand() % 16;
-        monsters[i].type = hextobinary(type);
+        monsters[i] = npc();
+
+
+        monster_description desc;
+
+        while (1)
+        {
+            desc = d->monster_descriptions.at(rand_in_range(0, d->monster_descriptions.size()-1));
+            int chance = rand_in_range(1, 100);
+
+            if (chance <= desc.rarity)
+            {
+                break;
+            }
+        }
+
+        monsters[i].set(desc.name, desc.description, desc.symbol, desc.color.at(0), desc.speed.roll(), desc.abilities, desc.hitpoints.roll(), desc.damage, desc.rarity);
+
+    monsters[i].speed = monsters[i].speed_from_file;
+        monsters[i].type = hextobinary(monsters[i].abilities % 16);
+
         monsters[i].alive = 1;
         monsters[i].sequencenumber = i + 1;
         monsters[i].nextturn = 0;
         monsters[i].memory.y = 0;
         monsters[i].memory.x = 0;
         monsters[i].isNPC = 1;
-
-        if (type < 10)
-        {
-            char numeric[] = "0123456789";
-            monsters[i].to_string = numeric[type];
-        }
-        else
-        {
-            char alpha[] = "abcdef";
-            monsters[i].to_string = alpha[type - 10];
-        }
 
         while (1)
         {

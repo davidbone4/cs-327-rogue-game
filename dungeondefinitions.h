@@ -73,6 +73,28 @@ public:
     char to_string;
     const char *type;
     position memory;
+    std::string name, description;
+    uint32_t color;
+    uint32_t abilities;
+    int speed_from_file;
+    uint32_t hitpoints;
+    dice damage;
+    uint32_t rarity;
+
+    npc() : name(), description(), to_string(0), color(0),
+                          abilities(0), speed_from_file(), hitpoints(), damage(),
+                          rarity(0)
+  {
+  }
+  void set(const std::string &name,
+           const std::string &description,
+           const char symbol,
+           const uint32_t &color,
+           const uint32_t &speed,
+           const uint32_t abilities,
+           const uint32_t &hitpoints,
+           const dice &damage,
+           const uint32_t rarity);
 } npc;
 
 typedef class pc : public character
@@ -81,6 +103,41 @@ public:
     cell map[DUNGEON_Y][DUNGEON_X];
 } pc;
 
+typedef struct object
+{
+public:
+    std::string name, description;
+    object_type_t type;
+    uint32_t color;
+    uint32_t hit, dodge, defence, weight, speed, attribute, value;
+    bool artifact;
+    dice damage;
+    uint32_t rarity;
+
+    object() : name(), description(), type(objtype_no_type),
+                           color(0), hit(), damage(),
+                           dodge(), defence(), weight(),
+                           speed(), attribute(), value(),
+                           artifact(false), rarity(0)
+    {
+    }
+    void set(const std::string &name,
+             const std::string &description,
+             const object_type_t type,
+             const uint32_t color,
+             const uint32_t &hit,
+             const dice &damage,
+             const uint32_t &dodge,
+             const uint32_t &defence,
+             const uint32_t &weight,
+             const uint32_t &speed,
+             const uint32_t &attrubute,
+             const uint32_t &value,
+             const bool artifact,
+             const uint32_t rarity);
+
+} object;
+
 typedef class dungeon
 {
 public:
@@ -88,6 +145,7 @@ public:
     room8bit rooms[MAX_ROOMS];
     uint16_t num_rooms;
     npc *monsters;
+    object *objects;
     int num_monsters;
     pc PC;
     uint8_t distance[DUNGEON_Y][DUNGEON_X];

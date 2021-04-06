@@ -22,7 +22,7 @@ void end_game();
 
 int main(int argc, char const *argv[])
 {
-    // io_init_terminal();
+    io_init_terminal();
 
 
 
@@ -67,8 +67,6 @@ int main(int argc, char const *argv[])
     d = &dungeon;
 
     parse_descriptions(d);
-    print_descriptions(d);
-    return 0;
 
     h = init_monsters(d, nummon);
     const char *header = "Welcome to David Bone's cs327 project!";
