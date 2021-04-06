@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <ncurses.h>
 #include "heap.h"
+#include "descriptions.h"
 
 #define DUNGEON_X 80
 #define DUNGEON_Y 21
@@ -14,6 +15,9 @@
 #define MAX_UP 3
 #define MIN_DOWN 1
 #define MAX_DOWN 3
+#define SAVE_DIR "rlg327"
+#define MONSTER_DESC_FILE "monster_desc.txt"
+#define OBJECT_DESC_FILE "object_desc.txt"
 
 typedef enum
 {
@@ -88,6 +92,9 @@ public:
     pc PC;
     uint8_t distance[DUNGEON_Y][DUNGEON_X];
     uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
+    std::vector<monster_description> monster_descriptions;
+    std::vector<object_description> object_descriptions;
+
 } dungeon_type;
 
 typedef struct corridor_path
@@ -114,3 +121,6 @@ void run_game(dungeon_type *d);
 void printDungeon(dungeon_type *d);
 dungeon_type generate(int seed);
 int islineofsight(dungeon_type *d, uint8_t y, uint8_t x, position pc);
+uint32_t parse_descriptions(dungeon_type *d);
+uint32_t print_descriptions(dungeon_type *d);
+uint32_t destroy_descriptions(dungeon_type *d);

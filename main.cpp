@@ -7,6 +7,7 @@
 #include <cmath>
 
 #include "dungeondefinitions.h"
+
 int seed;
 int fog;
 heap_t h;
@@ -19,9 +20,11 @@ void printFogDungeon(dungeon_type *d);
 void io_init_terminal(void);
 void end_game();
 
-void main_not(int argc, char const *argv[])
+int main(int argc, char const *argv[])
 {
-    io_init_terminal();
+    // io_init_terminal();
+
+
 
     int boolsave = 0;
     int boolload = 0;
@@ -62,6 +65,10 @@ void main_not(int argc, char const *argv[])
 
     dungeon_type *d;
     d = &dungeon;
+
+    parse_descriptions(d);
+    print_descriptions(d);
+    return 0;
 
     h = init_monsters(d, nummon);
     const char *header = "Welcome to David Bone's cs327 project!";
