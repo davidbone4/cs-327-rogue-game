@@ -7,7 +7,7 @@ ECHO = echo
 RM = rm -f
 
 build:
-	g++ DungeonGenerator.cpp pathfinding.cpp heap.cpp monster.cpp main.cpp monster-reader.cpp -o rlg327 -lm -lcurses
+	g++ DungeonGenerator.cpp pathfinding.cpp heap.cpp monster.cpp main.cpp descriptions.cpp dice.cpp -o rlg327 -lm -lcurses
 
 clean:
 	rm rlg327

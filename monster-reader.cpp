@@ -42,7 +42,7 @@ private:
 
 vector<monster> monsters(1, monster());
 
-int main(int argc, char const *argv[])
+int main_not(int argc, char const *argv[])
 {
     string dictionary[9] = {"NAME", "COLOR", "SPEED", "ABIL", "HP", "DAM", "SYMB", "RRTY"};
 
