@@ -22,9 +22,23 @@ void end_game();
 
 int main(int argc, char const *argv[])
 {
+
     io_init_terminal();
-
-
+    if (has_colors() == FALSE)
+    {
+        endwin();
+        printf("Your terminal does not support color\n");
+        exit(1);
+    }
+    start_color();
+    init_pair(COLOR_BLACK, COLOR_WHITE, COLOR_BLACK);
+    init_pair(COLOR_BLUE, COLOR_BLUE, COLOR_BLACK);
+    init_pair(COLOR_CYAN, COLOR_CYAN, COLOR_BLACK);
+    init_pair(COLOR_GREEN, COLOR_GREEN, COLOR_BLACK);
+    init_pair(COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(COLOR_RED, COLOR_RED, COLOR_BLACK);
+    init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
+    init_pair(COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK);
 
     int boolsave = 0;
     int boolload = 0;
@@ -69,6 +83,9 @@ int main(int argc, char const *argv[])
     parse_descriptions(d);
 
     h = init_monsters(d, nummon);
+
+    init_objects(d);
+
     const char *header = "Welcome to David Bone's cs327 project!";
     for (int i = 0; i < strlen(header); i++)
     {
@@ -324,6 +341,15 @@ int player_turn(dungeon_type *d)
 
                 for (int j = 0; j < strlen(monster_string); j++)
                 {
+                    if (j == 0)
+                    {
+                        attron(COLOR_PAIR(d->monsters[i].color));
+                    }
+                    if (j == 1)
+                    {
+
+                        attroff(COLOR_PAIR(d->monsters[i].color));
+                    }
                     mvaddch((i % 22) + 1, j, monster_string[j]);
                 }
             }
@@ -363,7 +389,7 @@ int player_turn(dungeon_type *d)
         clear();
         endwin();
         exit(0);
-    case 't':
+    case 'f':
 
         if (fog)
         {
@@ -498,8 +524,8 @@ void teleportPC(dungeon_type *d)
             break;
         case 'r':
 
-            newPos.x = rand() % (DUNGEON_X-1)+1;
-            newPos.y = rand() % (DUNGEON_Y-1)+1;
+            newPos.x = rand() % (DUNGEON_X - 1) + 1;
+            newPos.y = rand() % (DUNGEON_Y - 1) + 1;
             out = 1;
             break;
         }
@@ -540,6 +566,15 @@ void printFogDungeon(dungeon_type *d)
             else if (d->PC.map[i][j].type == ROOM)
             {
                 mvaddch(i + 1, j, '.');
+                for (int k = 0; k < d->num_objects; k++)
+                {
+                    if (d->objects[k].pos.y == i && d->objects[k].pos.x == j)
+                    {
+                        char object_char = object_symbol[d->objects[k].type];
+                        mvaddch(i + 1, j, object_char);
+                        break;
+                    }
+                }
             }
             else if (d->PC.map[i][j].type == CORRIDOR)
             {

@@ -113,12 +113,13 @@ public:
     bool artifact;
     dice damage;
     uint32_t rarity;
+    position pos;
 
     object() : name(), description(), type(objtype_no_type),
                            color(0), hit(), damage(),
                            dodge(), defence(), weight(),
                            speed(), attribute(), value(),
-                           artifact(false), rarity(0)
+                           artifact(false), rarity(0), pos()
     {
     }
     void set(const std::string &name,
@@ -131,10 +132,11 @@ public:
              const uint32_t &defence,
              const uint32_t &weight,
              const uint32_t &speed,
-             const uint32_t &attrubute,
+             const uint32_t &attribute,
              const uint32_t &value,
              const bool artifact,
-             const uint32_t rarity);
+             const uint32_t rarity,
+             const position pos);
 
 } object;
 
@@ -147,6 +149,7 @@ public:
     npc *monsters;
     object *objects;
     int num_monsters;
+    int num_objects;
     pc PC;
     uint8_t distance[DUNGEON_Y][DUNGEON_X];
     uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
@@ -187,3 +190,4 @@ int islineofsight(dungeon_type *d, uint8_t y, uint8_t x, position pc);
 uint32_t parse_descriptions(dungeon_type *d);
 uint32_t print_descriptions(dungeon_type *d);
 uint32_t destroy_descriptions(dungeon_type *d);
+void init_objects(dungeon_type *d);

@@ -19,7 +19,7 @@ void movemonsternontunneling(dungeon_type *d, npc *m);
 void move_monster_tunneling(dungeon_type *d, npc *m);
 void run_game(dungeon_type *d);
 int rand_in_range(int min, int max);
-const char* string_type(uint32_t num);
+const char *string_type(uint32_t num);
 
 void npc::set(const std::string &name,
               const std::string &description,
@@ -40,6 +40,39 @@ void npc::set(const std::string &name,
     this->hitpoints = hitpoints;
     this->damage = damage;
     this->rarity = rarity;
+}
+
+void object::set(const std::string &name,
+                 const std::string &description,
+                 const object_type_t type,
+                 const uint32_t color,
+                 const uint32_t &hit,
+                 const dice &damage,
+                 const uint32_t &dodge,
+                 const uint32_t &defence,
+                 const uint32_t &weight,
+                 const uint32_t &speed,
+                 const uint32_t &attribute,
+                 const uint32_t &value,
+                 const bool artifact,
+                 const uint32_t rarity,
+                 const position pos)
+{
+    this->name = name;
+    this->description = description;
+    this->type = type;
+    this->color = color;
+    this->hit = hit;
+    this->dodge = dodge;
+    this->defence = defence;
+    this->damage = damage;
+    this->rarity = rarity;
+    this->weight = weight;
+    this->speed = speed;
+    this->attribute = attribute;
+    this->value = value;
+    this->artifact = artifact;
+    this->pos = pos;
 }
 
 int rand_in_range(int min, int max)
@@ -113,6 +146,53 @@ heap_t init_monsters(dungeon_type *d, int numMonsters)
     d->num_monsters = numMonsters;
 
     return h;
+}
+
+void init_objects(dungeon_type *d)
+{
+
+    int numObjects = 10;
+
+    object *objects = new object[numObjects];
+
+    for (int i = 0; i < numObjects; i++)
+    {
+        objects[i] = object();
+
+        object_description desc;
+
+        while (1)
+        {
+            desc = d->object_descriptions.at(rand_in_range(0, d->object_descriptions.size() - 1));
+            int chance = rand_in_range(1, 100);
+
+            if (chance <= desc.rarity)
+            {
+                break;
+            }
+        }
+
+
+
+        while (1)
+        {
+            int Y = (rand() % (DUNGEON_Y - 1)) + 1;
+            int X = (rand() % (DUNGEON_X - 1)) + 1;
+            if (d->map[Y][X].type == ROOM  )
+            {
+                position pos;
+                pos.y = Y;
+                pos.x = X;
+                objects[i].set(desc.name, desc.description, desc.type, desc.color, desc.hit.roll(), desc.damage, desc.dodge.roll(), desc.defence.roll(),desc.weight.roll(),desc.speed.roll(),desc.attribute.roll(),desc.value.roll(),desc.artifact, desc.rarity, pos);
+
+                break;
+            }
+        }
+    }
+
+    d->objects = objects;
+    d->num_objects = numObjects;
+
 }
 
 static int32_t monster_cmp(const void *key, const void *with)
