@@ -39,7 +39,6 @@ void npc::set(const std::string &name,
     this->hitpoints = hitpoints;
     this->damage = damage;
     this->rarity = rarity;
-
 }
 
 int rand_in_range(int min, int max)
@@ -69,12 +68,11 @@ heap_t init_monsters(dungeon_type *d, int numMonsters)
     {
         monsters[i] = npc();
 
-
         monster_description desc;
 
         while (1)
         {
-            desc = d->monster_descriptions.at(rand_in_range(0, d->monster_descriptions.size()-1));
+            desc = d->monster_descriptions.at(rand_in_range(0, d->monster_descriptions.size() - 1));
             int chance = rand_in_range(1, 100);
 
             if (chance <= desc.rarity)
@@ -85,7 +83,7 @@ heap_t init_monsters(dungeon_type *d, int numMonsters)
 
         monsters[i].set(desc.name, desc.description, desc.symbol, desc.color.at(0), desc.speed.roll(), desc.abilities, desc.hitpoints.roll(), desc.damage, desc.rarity);
 
-    monsters[i].speed = monsters[i].speed_from_file;
+        monsters[i].speed = monsters[i].speed_from_file;
         monsters[i].type = hextobinary(monsters[i].abilities % 16);
 
         monsters[i].alive = 1;
