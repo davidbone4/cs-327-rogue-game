@@ -164,6 +164,11 @@ typedef struct corridor_path
 
 typedef enum
 {
+    BOSS,
+    UNIQUE,
+    PICKUP,
+    DESTROY,
+    PASS,
     ERRATIC,
     TUNNELING,
     TELEPATHY,

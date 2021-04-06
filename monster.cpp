@@ -19,6 +19,7 @@ void movemonsternontunneling(dungeon_type *d, npc *m);
 void move_monster_tunneling(dungeon_type *d, npc *m);
 void run_game(dungeon_type *d);
 int rand_in_range(int min, int max);
+const char* string_type(uint32_t num);
 
 void npc::set(const std::string &name,
               const std::string &description,
@@ -84,7 +85,7 @@ heap_t init_monsters(dungeon_type *d, int numMonsters)
         monsters[i].set(desc.name, desc.description, desc.symbol, desc.color.at(0), desc.speed.roll(), desc.abilities, desc.hitpoints.roll(), desc.damage, desc.rarity);
 
         monsters[i].speed = monsters[i].speed_from_file;
-        monsters[i].type = hextobinary(monsters[i].abilities % 16);
+        monsters[i].type = std::bitset<9>(monsters[i].abilities).to_string().c_str();
 
         monsters[i].alive = 1;
         monsters[i].sequencenumber = i + 1;
