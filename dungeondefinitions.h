@@ -15,7 +15,7 @@
 #define MAX_UP 3
 #define MIN_DOWN 1
 #define MAX_DOWN 3
-#define SAVE_DIR ".rlg327"
+#define SAVE_DIR "rlg327"
 #define MONSTER_DESC_FILE "monster_desc.txt"
 #define OBJECT_DESC_FILE "object_desc.txt"
 
