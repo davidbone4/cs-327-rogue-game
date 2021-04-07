@@ -1,5 +1,26 @@
 # cs-327-rogue-game by David bone
 
+## Assignment 1.08
+
+This assignment had me using the new file parcing to add different types of monsters and objects to the dungeon.
+
+I began by using Professor Sheaffer's parcer for both objects and monsters. This took some time to read through and understand how to fit with my current architecture.
+
+The dungeon works as it did in Assignment 1.06, but now it renders the new monsters and objects into the dungeon space.
+
+Both the monsters and objects include the symbol, color, and abilities specified when generated. All other values are stored in their objects within the dungeon architecture. This includes rolling the values that are meant to be rolled at generation.
+
+I also fixed an error I had in 1.06 where I had mapped the fog of war toggle to 't' instead of 'f'. Everything should work as expected.
+
+I opted not to include any optional functionality in this assignment. Thank you!
+
+USAGE:
+
+    >make
+    > ./rlg327 --nummon <desired integer of monsters>
+
+Tested on Ubuntu
+
 ## Assignment 1.07
 
 This assignment consisted of parsing a text document for information on various monsters. I did not implement the optional Item definitions.

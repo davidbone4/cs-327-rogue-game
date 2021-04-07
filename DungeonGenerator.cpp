@@ -218,13 +218,18 @@ void printDungeon(dungeon_type *d)
             {
                 if (d->monsters[k].pos.y == i && d->monsters[k].pos.x == j && d->monsters[k].alive)
                 {
+                    attron(COLOR_PAIR(d->monsters[k].color));
                     mvaddch(i + 1, j, d->monsters[k].to_string);
+                    attroff(COLOR_PAIR(d->monsters[k].color));
                     out = 1;
                     break;
                 }
             }
             if (out)
+            {
                 continue;
+            }
+
             if (d->PC.pos.y == i && d->PC.pos.x == j)
             {
                 mvaddch(i + 1, j, '@');
@@ -236,6 +241,17 @@ void printDungeon(dungeon_type *d)
             else if (d->map[i][j].type == ROOM)
             {
                 mvaddch(i + 1, j, '.');
+                for (int k = 0; k < d->num_objects; k++)
+            {
+                if (d->objects[k].pos.y == i && d->objects[k].pos.x == j)
+                {
+                    char object_char = object_symbol[d->objects[k].type];
+                    attron(COLOR_PAIR(d->objects[k].color));
+                    mvaddch(i + 1, j, object_char);
+                    attroff(COLOR_PAIR(d->objects[k].color));
+                    break;
+                }
+            }
             }
             else if (d->map[i][j].type == CORRIDOR)
             {

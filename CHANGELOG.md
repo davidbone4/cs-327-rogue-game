@@ -96,3 +96,19 @@
     => stored all monsters in a vector
     => Tested on Ubuntu
     => Turned in Assignment 1.07
+4/5/2021
+    => added Professor Sheaffer's parcer into mine
+    => added dice and definitions into my project
+    => updated my npc class to include the new variables included
+    => created an object class to store objects
+    => added an object array in the dungeon class
+    => reworked init_monsters method to create an array of monsters using the monsters description array vector
+    => implemented logic to connect my path finding ai to the new monster architecture
+4/6/2021
+    => Added object initiation to the dungeon
+    => fixed print method to print both new monsters and object
+    => added color rendering
+    => fixed npc typing to include the 5 new attributes
+    => fixed unique monsters and artifacts
+    => tested on Ubuntu
+    => turned in Assignment 1.08
