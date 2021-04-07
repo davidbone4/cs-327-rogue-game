@@ -97,7 +97,7 @@
     => Tested on Ubuntu
     => Turned in Assignment 1.07
 4/5/2021
-    => added Professor Sheaffer's parcer into mine
+    => added Professor Sheaffer's parser into mine
     => added dice and definitions into my project
     => updated my npc class to include the new variables included
     => created an object class to store objects
