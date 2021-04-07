@@ -5,6 +5,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <math.h>
+#include <bitset>
 
 #include "dungeondefinitions.h"
 
