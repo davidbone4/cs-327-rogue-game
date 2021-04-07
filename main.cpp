@@ -84,8 +84,6 @@ int main(int argc, char const *argv[])
 
     h = init_monsters(d, nummon);
 
-    init_objects(d);
-
     const char *header = "Welcome to David Bone's cs327 project!";
     for (int i = 0; i < strlen(header); i++)
     {
@@ -571,7 +569,9 @@ void printFogDungeon(dungeon_type *d)
                     if (d->objects[k].pos.y == i && d->objects[k].pos.x == j)
                     {
                         char object_char = object_symbol[d->objects[k].type];
+                        attron(COLOR_PAIR(d->objects[k].color));
                         mvaddch(i + 1, j, object_char);
+                        attroff(COLOR_PAIR(d->objects[k].color));
                         break;
                     }
                 }
@@ -600,7 +600,9 @@ void printFogDungeon(dungeon_type *d)
         {
             if (islineofsight(d, d->monsters[i].pos.y, d->monsters[i].pos.x, d->PC.pos))
             {
+                attron(COLOR_PAIR(d->monsters[i].color));
                 mvaddch(d->monsters[i].pos.y + 1, d->monsters[i].pos.x, d->monsters[i].to_string);
+                attroff(COLOR_PAIR(d->monsters[i].color));
             }
         }
     }

@@ -98,6 +98,8 @@ heap_t init_monsters(dungeon_type *d, int numMonsters)
 
     npc *monsters = new npc[numMonsters];
 
+    int unique_spawned = 0;
+
     for (int i = 0; i < numMonsters; i++)
     {
         monsters[i] = npc();
@@ -107,6 +109,11 @@ heap_t init_monsters(dungeon_type *d, int numMonsters)
         while (1)
         {
             desc = d->monster_descriptions.at(rand_in_range(0, d->monster_descriptions.size() - 1));
+
+            if(std::bitset<9>(desc.abilities).to_string().c_str()[UNIQUE] == '1' && unique_spawned){
+                continue;
+            }
+
             int chance = rand_in_range(1, 100);
 
             if (chance <= desc.rarity)
@@ -119,6 +126,10 @@ heap_t init_monsters(dungeon_type *d, int numMonsters)
 
         monsters[i].speed = monsters[i].speed_from_file;
         monsters[i].type = std::bitset<9>(monsters[i].abilities).to_string().c_str();
+
+        if(monsters[i].type[UNIQUE]){
+            unique_spawned = 1;
+        }
 
         monsters[i].alive = 1;
         monsters[i].sequencenumber = i + 1;
@@ -145,6 +156,8 @@ heap_t init_monsters(dungeon_type *d, int numMonsters)
     d->monsters = monsters;
     d->num_monsters = numMonsters;
 
+    init_objects(d);
+
     return h;
 }
 
@@ -155,6 +168,8 @@ void init_objects(dungeon_type *d)
 
     object *objects = new object[numObjects];
 
+    bool artifact_spawned = false;
+
     for (int i = 0; i < numObjects; i++)
     {
         objects[i] = object();
@@ -164,12 +179,21 @@ void init_objects(dungeon_type *d)
         while (1)
         {
             desc = d->object_descriptions.at(rand_in_range(0, d->object_descriptions.size() - 1));
+
+            if(desc.artifact && artifact_spawned){
+                continue;
+            }
+
             int chance = rand_in_range(1, 100);
 
             if (chance <= desc.rarity)
             {
                 break;
             }
+        }
+
+        if(desc.artifact){
+            artifact_spawned = true;
         }
 
 
