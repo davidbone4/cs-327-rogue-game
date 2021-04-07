@@ -2,9 +2,9 @@
 
 ## Assignment 1.08
 
-This assignment had me using the new file parcing to add different types of monsters and objects to the dungeon.
+This assignment had me using the new file parsing to add different types of monsters and objects to the dungeon.
 
-I began by using Professor Sheaffer's parcer for both objects and monsters. This took some time to read through and understand how to fit with my current architecture.
+I began by using Professor Sheaffer's parser for both objects and monsters. This took some time to read through and understand how to fit with my current architecture.
 
 The dungeon works as it did in Assignment 1.06, but now it renders the new monsters and objects into the dungeon space.
 
