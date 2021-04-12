@@ -112,8 +112,10 @@
     => fixed unique monsters and artifacts
     => tested on Ubuntu
     => turned in Assignment 1.08
-4/11/12
+4/11/2021
     => added inventory and carry space to pc
     => added is picked_up boolean to object
     => implemented auto pick up for objects on the map
     => finished the 'w' equip command.
+4/12/2021
+    => finished the 't' unequip command.

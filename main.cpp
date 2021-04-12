@@ -21,6 +21,7 @@ void io_init_terminal(void);
 void end_game();
 objects_inventory equip(dungeon_type *d);
 objects_inventory getinventoryslot(dungeon_type *d, object o);
+int unequip(dungeon_type *d);
 
 int main(int argc, char const *argv[])
 {
@@ -456,11 +457,20 @@ int player_turn(dungeon_type *d)
             "RING_1",
             "RING_2",
         };
-        if (slot > 0)
+        if (slot >= 0)
         {
-            sprintf(header, "Equipped an object into the %s slot", dictionary[slot].c_str());
+            sprintf(header, "Equipped an object into the %s inventory slot", dictionary[slot].c_str());
         }
 
+        out = 0;
+        break;
+    }
+    case 't':
+    {
+        int slot = unequip(d);
+        if (slot >= 0){
+            sprintf(header, "Unequipped an object into the %d carry slot", slot);
+        }
         out = 0;
         break;
     }
@@ -522,7 +532,8 @@ objects_inventory equip(dungeon_type *d)
     sprintf(header, "What item would you like to equip (enter 0-9)");
     while (1)
     {
-        for(int i = 0; i < 79; i++){
+        for (int i = 0; i < 79; i++)
+        {
             mvaddch(0, i, ' ');
         }
 
@@ -610,6 +621,108 @@ objects_inventory equip(dungeon_type *d)
         }
 
         return index;
+    }
+}
+
+int unequip(dungeon_type *d)
+{
+    char header[100];
+
+    sprintf(header, "What item would you like to unequip (enter a-l)");
+    while (1)
+    {
+        for (int i = 0; i < 79; i++)
+        {
+            mvaddch(0, i, ' ');
+        }
+
+        for (int i = 0; i < strlen(header); i++)
+        {
+            mvaddch(0, i, header[i]);
+        }
+
+        refresh();
+
+        int carry_index;
+        int ch = getch();
+        object selected_object;
+        objects_inventory object_unequpped;
+
+        switch (ch)
+        {
+        case 'a':
+            selected_object = d->PC.inventory[WEAPON];
+            object_unequpped = WEAPON;
+            break;
+        case 'b':
+            selected_object = d->PC.inventory[OFFHAND];
+            object_unequpped = OFFHAND;
+            break;
+        case 'c':
+            selected_object = d->PC.inventory[RANGED];
+            object_unequpped = RANGED;
+            break;
+        case 'd':
+            selected_object = d->PC.inventory[ARMOR];
+            object_unequpped = ARMOR;
+            break;
+        case 'e':
+            selected_object = d->PC.inventory[HELMET];
+            object_unequpped = HELMET;
+            break;
+        case 'f':
+            selected_object = d->PC.inventory[CLOAK];
+            object_unequpped = CLOAK;
+            break;
+        case 'g':
+            selected_object = d->PC.inventory[GLOVES];
+            object_unequpped = GLOVES;
+            break;
+        case 'h':
+            selected_object = d->PC.inventory[BOOTS];
+            object_unequpped = BOOTS;
+            break;
+        case 'i':
+            selected_object = d->PC.inventory[AMULET];
+            object_unequpped = AMULET;
+            break;
+        case 'j':
+            selected_object = d->PC.inventory[LIGHT];
+            object_unequpped = LIGHT;
+            break;
+        case 'k':
+            selected_object = d->PC.inventory[RING_1];
+            object_unequpped = RING_1;
+            break;
+        case 'l':
+            selected_object = d->PC.inventory[RING_2];
+            object_unequpped = RING_2;
+            break;
+        case 27: //escape key
+
+            return NOTYPE;
+        default:
+            sprintf(header, "Unknown Key Input: %d", ch);
+            continue;
+            break;
+        }
+
+
+
+        if(selected_object.type == objtype_no_type){
+            sprintf(header, "No object to unequip, try again");
+            continue;
+        }
+
+        for(int i = 0; i < 10;i++){
+            if(d->PC.carry[i].type == objtype_no_type){
+                d->PC.carry[i] = selected_object;
+                d->PC.inventory[object_unequpped] = object();
+                return i;
+            }
+        }
+
+        return -1;
     }
 }
 
