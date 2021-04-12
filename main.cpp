@@ -69,6 +69,18 @@ int main(int argc, char const *argv[])
     dungeon.PC.sequencenumber = 0;
     dungeon.PC.speed = 10;
     dungeon.PC.isNPC = 0;
+    dungeon.PC.hp = 200;
+    dungeon.PC.damage = dice(0, 1, 4);
+
+    for (int i = 0; i < 12; i++)
+    {
+        dungeon.PC.inventory[i] = object();
+        if (i > 9)
+        {
+            continue;
+        }
+        dungeon.PC.carry[i] = object();
+    }
     for (int i = 0; i < DUNGEON_Y; i++)
     {
         for (int j = 0; j < DUNGEON_X; j++)
@@ -160,6 +172,22 @@ int player_turn(dungeon_type *d)
     else
     {
         printDungeon(d);
+    }
+
+    for (int i = 0; i < d->num_objects; i++)
+    {
+        if ((d->objects[i].pos.x == d->PC.pos.x) && (d->objects[i].pos.y == d->PC.pos.y) && d->objects[i].picked_up == false)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                if (d->PC.carry[j].type == objtype_no_type)
+                {
+                    d->objects[i].picked_up = true;
+                    d->PC.carry[j] = d->objects[i];
+                    break;
+                }
+            }
+        }
     }
 
     const char *placeholder = "placeholder";
@@ -566,7 +594,7 @@ void printFogDungeon(dungeon_type *d)
                 mvaddch(i + 1, j, '.');
                 for (int k = 0; k < d->num_objects; k++)
                 {
-                    if (d->objects[k].pos.y == i && d->objects[k].pos.x == j)
+                    if (d->objects[k].pos.y == i && d->objects[k].pos.x == j && d->objects[k].picked_up == false)
                     {
                         char object_char = object_symbol[d->objects[k].type];
                         attron(COLOR_PAIR(d->objects[k].color));

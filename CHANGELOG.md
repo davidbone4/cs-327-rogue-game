@@ -112,3 +112,7 @@
     => fixed unique monsters and artifacts
     => tested on Ubuntu
     => turned in Assignment 1.08
+4/11/12
+    => added inventory and carry space to pc
+    => added is picked_up boolean to object
+    => implemented auto pick up for objects on the map

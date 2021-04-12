@@ -243,7 +243,7 @@ void printDungeon(dungeon_type *d)
                 mvaddch(i + 1, j, '.');
                 for (int k = 0; k < d->num_objects; k++)
             {
-                if (d->objects[k].pos.y == i && d->objects[k].pos.x == j)
+                if (d->objects[k].pos.y == i && d->objects[k].pos.x == j && d->objects[k].picked_up == false)
                 {
                     char object_char = object_symbol[d->objects[k].type];
                     attron(COLOR_PAIR(d->objects[k].color));
