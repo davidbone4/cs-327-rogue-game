@@ -116,3 +116,4 @@
     => added inventory and carry space to pc
     => added is picked_up boolean to object
     => implemented auto pick up for objects on the map
+    => finished the 'w' equip command.

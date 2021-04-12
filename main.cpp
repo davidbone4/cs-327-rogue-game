@@ -19,6 +19,8 @@ int player_turn(dungeon_type *d);
 void printFogDungeon(dungeon_type *d);
 void io_init_terminal(void);
 void end_game();
+objects_inventory equip(dungeon_type *d);
+objects_inventory getinventoryslot(dungeon_type *d, object o);
 
 int main(int argc, char const *argv[])
 {
@@ -436,6 +438,32 @@ int player_turn(dungeon_type *d)
         teleported = 1;
         sprintf(header, "Teleported pc to (%d, %d)", d->PC.pos.y, d->PC.pos.x);
         break;
+
+    case 'w':
+    {
+        int slot = equip(d);
+        std::string dictionary[12] = {
+            "WEAPON",
+            "OFFHAND",
+            "RANGED",
+            "ARMOR",
+            "HELMET",
+            "CLOAK",
+            "GLOVES",
+            "BOOTS",
+            "AMULET",
+            "LIGHT",
+            "RING_1",
+            "RING_2",
+        };
+        if (slot > 0)
+        {
+            sprintf(header, "Equipped an object into the %s slot", dictionary[slot].c_str());
+        }
+
+        out = 0;
+        break;
+    }
     default:
         sprintf(header, "Unknown Key Input: %d", ch);
         out = 0;
@@ -485,6 +513,144 @@ void end_game()
     int ch = getch();
     endwin();
     exit(0);
+}
+
+objects_inventory equip(dungeon_type *d)
+{
+    char header[100];
+
+    sprintf(header, "What item would you like to equip (enter 0-9)");
+    while (1)
+    {
+        for(int i = 0; i < 79; i++){
+            mvaddch(0, i, ' ');
+        }
+
+        for (int i = 0; i < strlen(header); i++)
+        {
+            mvaddch(0, i, header[i]);
+        }
+
+        refresh();
+
+        int carry_index;
+        int ch = getch();
+        object selected_object;
+
+        switch (ch)
+        {
+        case '0':
+            selected_object = d->PC.carry[0];
+            carry_index = 0;
+            break;
+        case '1':
+            selected_object = d->PC.carry[1];
+            carry_index = 1;
+            break;
+        case '2':
+            selected_object = d->PC.carry[2];
+            carry_index = 2;
+            break;
+        case '3':
+            selected_object = d->PC.carry[3];
+            carry_index = 3;
+            break;
+        case '4':
+            selected_object = d->PC.carry[4];
+            carry_index = 4;
+            break;
+        case '5':
+            selected_object = d->PC.carry[5];
+            carry_index = 5;
+            break;
+        case '6':
+            selected_object = d->PC.carry[6];
+            carry_index = 6;
+            break;
+        case '7':
+            selected_object = d->PC.carry[7];
+            carry_index = 7;
+            break;
+        case '8':
+            selected_object = d->PC.carry[8];
+            carry_index = 8;
+            break;
+        case '9':
+            selected_object = d->PC.carry[9];
+            carry_index = 9;
+            break;
+        case 27: //escape key
+
+            return NOTYPE;
+        default:
+            sprintf(header, "Unknown Key Input: %d", ch);
+            continue;
+            break;
+        }
+
+        if (selected_object.type == objtype_no_type)
+        {
+            sprintf(header, "No object there... try again.");
+            continue;
+        }
+
+        objects_inventory index = getinventoryslot(d, selected_object);
+
+        object replaced = d->PC.inventory[index];
+
+        d->PC.inventory[index] = selected_object;
+
+        if (replaced.type == objtype_no_type)
+        {
+            d->PC.carry[carry_index] = object();
+        }
+        else
+        {
+            d->PC.carry[carry_index] = replaced;
+        }
+
+        return index;
+    }
+}
+
+objects_inventory getinventoryslot(dungeon_type *d, object o)
+{
+
+    switch (o.type)
+    {
+
+    case objtype_WEAPON:
+        return WEAPON;
+    case objtype_OFFHAND:
+        return OFFHAND;
+    case objtype_RANGED:
+        return RANGED;
+    case objtype_ARMOR:
+        return ARMOR;
+    case objtype_HELMET:
+        return HELMET;
+    case objtype_CLOAK:
+        return CLOAK;
+    case objtype_GLOVES:
+        return GLOVES;
+    case objtype_BOOTS:
+        return BOOTS;
+    case objtype_AMULET:
+        return AMULET;
+    case objtype_LIGHT:
+        return LIGHT;
+    case objtype_RING:
+        if (d->PC.inventory[RING_1].type == d->PC.inventory[RING_2].type)
+        {
+            return RING_1;
+        }
+        else
+        {
+            return RING_2;
+        }
+    default:
+        return NOTYPE;
+    }
 }
 
 void teleportPC(dungeon_type *d)

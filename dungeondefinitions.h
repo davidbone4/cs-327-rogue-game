@@ -41,7 +41,8 @@ typedef enum
     AMULET,
     LIGHT,
     RING_1,
-    RING_2
+    RING_2,
+    NOTYPE = -1
 } objects_inventory;
 typedef enum dim
 {
