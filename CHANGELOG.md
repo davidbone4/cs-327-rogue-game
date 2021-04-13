@@ -122,4 +122,11 @@
     => finished the 'd' drop command
     => finished the 'x' delete command
     => finished the 'i' list inventory command
-    => finished the 'e' carrying inventory
+    => finished the 'e' carrying command
+    => finished the 'I' inspect command
+    => finished the 'L' Look command
+    => added the speed of inventory
+    => disabled NPC vs NPC
+    => added hp logic for equipment
+    => allowed enemies to hit you
+    => added hp bars of the Player and the last hit npc at the bottom of the screen

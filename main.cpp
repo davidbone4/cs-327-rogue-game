@@ -123,15 +123,14 @@ void run_game(dungeon_type *d)
         if (c->isNPC == 0)
         {
             int out = 0;
-            while (!out)
-            {
-                out = player_turn(d);
-            }
-
             if (c->alive == 0)
             {
                 end_game();
                 break;
+            }
+            while (!out)
+            {
+                out = player_turn(d);
             }
         }
         else if (c->type[TUNNELING] == '1')
@@ -199,15 +198,27 @@ int player_turn(dungeon_type *d)
         }
     }
 
-    const char *placeholder = "placeholder";
-    for (int i = 0; i < strlen(placeholder); i++)
+    d->PC.speed = 10;
+    int maxhealth = 200;
+    for (int i = 0; i < 12; i++)
     {
-        mvaddch(22, i, placeholder[i]);
+        d->PC.speed += d->PC.inventory[i].speed;
+        maxhealth += d->PC.inventory[i].hit;
     }
-    for (int i = 0; i < strlen(placeholder); i++)
+
+    std::string hp = "Player Health: ";
+    hp += std::to_string(d->PC.hp);
+    hp.push_back('/');
+    hp += std::to_string(maxhealth);
+
+    for (int i = 0; i < hp.length(); i++)
     {
-        mvaddch(23, i, placeholder[i]);
+        mvaddch(22, i, hp.at(i));
     }
+    // for (int i = 0; i < strlen(placeholder); i++)
+    // {
+    //     mvaddch(23, i, placeholder[i]);
+    // }
 
     refresh();
 
@@ -547,7 +558,47 @@ int player_turn(dungeon_type *d)
         }
     }
 
+    npc hurtmonster = d->monsters[0];
+
+    for (int i = 0; i < d->num_monsters; i++)
+    {
+        if (d->monsters[i].pos.x == d->PC.pos.x && d->monsters[i].pos.y == d->PC.pos.y)
+        {
+            int damage = d->PC.damage.roll();
+
+            for (int i = 0; i < 12; i++)
+            {
+                damage += d->PC.inventory[i].damage.roll();
+            }
+            d->monsters[i].hitpoints -= damage;
+            if (d->monsters[i].hitpoints <= 0)
+            {
+                d->monsters[i].alive = 0;
+            }
+
+            //TODO if you kill the boss you win
+            hurtmonster = d->monsters[i];
+            break;
+        }
+    }
     clear();
+
+    std::string monsterhp;
+    monsterhp.push_back(hurtmonster.to_string);
+    monsterhp += ": ";
+    monsterhp += std::to_string(hurtmonster.hitpoints);
+    monsterhp.push_back('/');
+    monsterhp += std::to_string(hurtmonster.max_hitpoints);
+
+    attron(COLOR_PAIR(hurtmonster.color));
+    mvaddch(23, 0, monsterhp.at(0));
+    attroff(COLOR_PAIR(hurtmonster.color));
+
+    for (int i = 1; i < monsterhp.length(); i++)
+    {
+
+        mvaddch(23, i, monsterhp.at(i));
+    }
 
     for (int i = 0; i < strlen(header); i++)
     {
@@ -673,7 +724,10 @@ objects_inventory equip(dungeon_type *d)
         else
         {
             d->PC.carry[carry_index] = replaced;
+            d->PC.hp -= replaced.hit;
         }
+
+        d->PC.hp += selected_object.hit;
 
         return index;
     }
@@ -773,6 +827,7 @@ int unequip(dungeon_type *d)
             if (d->PC.carry[i].type == objtype_no_type)
             {
                 d->PC.carry[i] = selected_object;
+                d->PC.hp -= selected_object.hit;
                 d->PC.inventory[object_unequpped] = object();
                 return i;
             }
@@ -1523,7 +1578,7 @@ void printFogDungeon(dungeon_type *d)
 
         if (xDis < 3 && yDis < 3)
         {
-            if (islineofsight(d, d->monsters[i].pos.y, d->monsters[i].pos.x, d->PC.pos))
+            if (d->monsters[i].alive == 1 &&islineofsight(d, d->monsters[i].pos.y, d->monsters[i].pos.x, d->PC.pos))
             {
                 attron(COLOR_PAIR(d->monsters[i].color));
                 mvaddch(d->monsters[i].pos.y + 1, d->monsters[i].pos.x, d->monsters[i].to_string);

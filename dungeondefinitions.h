@@ -93,12 +93,13 @@ public:
     uint32_t color;
     uint32_t abilities;
     int speed_from_file;
-    uint32_t hitpoints;
+    int32_t hitpoints;
+    int32_t max_hitpoints;
     dice damage;
     uint32_t rarity;
 
     npc() : name(), description(), to_string(0), color(0),
-            abilities(0), speed_from_file(), hitpoints(), damage(),
+            abilities(0), speed_from_file(), hitpoints(), max_hitpoints(),damage(),
             rarity(0)
     {
     }
@@ -108,7 +109,7 @@ public:
              const uint32_t &color,
              const uint32_t &speed,
              const uint32_t abilities,
-             const uint32_t &hitpoints,
+             const int32_t &hitpoints,
              const dice &damage,
              const uint32_t rarity);
 } npc;
@@ -119,7 +120,8 @@ public:
     std::string name, description;
     object_type_t type;
     uint32_t color;
-    uint32_t hit, dodge, defence, weight, speed, attribute, value;
+    uint32_t dodge, defence, weight, speed, attribute, value;
+    uint32_t hit;
     bool artifact;
     dice damage;
     uint32_t rarity;
@@ -128,9 +130,9 @@ public:
     int position_in_dungeon;
 
     object() : name(), description(), type(objtype_no_type),
-               color(0), hit(), damage(),
+               color(0), hit(), damage(dice(0,0,1)),
                dodge(), defence(), weight(),
-               speed(), attribute(), value(),
+               speed(0), attribute(), value(),
                artifact(false), rarity(0), pos(), picked_up(),position_in_dungeon()
     {
     }
