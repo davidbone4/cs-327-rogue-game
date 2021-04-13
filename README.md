@@ -2,7 +2,7 @@
 
 ## Assignment 1.09
 
-The penutlimate assignment had me adding many object related commands to the dungeon. All now work as outlined in the assignment pdf. All must be used when looking at the dungeon and not having any other commands open. For instance, when the game is prompting the user for a carry slot after pressing the 'w' command, you cannot immediately look at the inventory, you must first press esc to cancel the wear command. All commands may be cancelled or exited using escape.
+The penultimate assignment had me adding many object related commands to the dungeon. All now work as outlined in the assignment pdf. All must be used when looking at the dungeon and not having any other commands open. For instance, when the game is prompting the user for a carry slot after pressing the 'w' command, you cannot immediately look at the inventory, you must first press esc to cancel the wear command. All commands may be cancelled or exited using escape.
 
 At the bottom of the screen, the player health will always be displayed, followed by the last damaged monster or the first monster in the dungeon array if no monster has been damaged. All damage, speed and health calculations work as outlined.
 
