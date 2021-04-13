@@ -57,7 +57,8 @@ void object::set(const std::string &name,
                  const bool artifact,
                  const uint32_t rarity,
                  const position pos,
-                 const bool picked_up)
+                 const bool picked_up,
+                 const int position_in_dungeon)
 {
     this->name = name;
     this->description = description;
@@ -75,6 +76,7 @@ void object::set(const std::string &name,
     this->artifact = artifact;
     this->pos = pos;
     this->picked_up = picked_up;
+    this->position_in_dungeon = position_in_dungeon;
 }
 
 int rand_in_range(int min, int max)
@@ -209,7 +211,7 @@ void init_objects(dungeon_type *d)
                 position pos;
                 pos.y = Y;
                 pos.x = X;
-                objects[i].set(desc.name, desc.description, desc.type, desc.color, desc.hit.roll(), desc.damage, desc.dodge.roll(), desc.defence.roll(),desc.weight.roll(),desc.speed.roll(),desc.attribute.roll(),desc.value.roll(),desc.artifact, desc.rarity, pos, false);
+                objects[i].set(desc.name, desc.description, desc.type, desc.color, desc.hit.roll(), desc.damage, desc.dodge.roll(), desc.defence.roll(),desc.weight.roll(),desc.speed.roll(),desc.attribute.roll(),desc.value.roll(),desc.artifact, desc.rarity, pos, false, i );
 
                 break;
             }

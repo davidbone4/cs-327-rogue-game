@@ -125,12 +125,13 @@ public:
     uint32_t rarity;
     position pos;
     bool picked_up;
+    int position_in_dungeon;
 
     object() : name(), description(), type(objtype_no_type),
                color(0), hit(), damage(),
                dodge(), defence(), weight(),
                speed(), attribute(), value(),
-               artifact(false), rarity(0), pos(), picked_up()
+               artifact(false), rarity(0), pos(), picked_up(),position_in_dungeon()
     {
     }
     void set(const std::string &name,
@@ -148,7 +149,8 @@ public:
              const bool artifact,
              const uint32_t rarity,
              const position pos,
-             const bool picked_up);
+             const bool picked_up,
+             const int position_in_dungeon);
 
 } object;
 
