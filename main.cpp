@@ -26,6 +26,8 @@ int dropitem(dungeon_type *d);
 int deleteitem(dungeon_type *d);
 void listinventory(dungeon_type *d);
 void listcarry(dungeon_type *d);
+void inspect(dungeon_type *d);
+int inspectMonster(dungeon_type *d);
 
 int main(int argc, char const *argv[])
 {
@@ -511,6 +513,22 @@ int player_turn(dungeon_type *d)
         out = 0;
         break;
     }
+    case 'I':
+    {
+        inspect(d);
+        out = 0;
+        break;
+    }
+    case 'L':
+    {
+        int returnvalue = inspectMonster(d);
+        if (returnvalue == -1)
+        {
+            sprintf(header, "No monster there, try again");
+        }
+        out = 0;
+        break;
+    }
     default:
         sprintf(header, "Unknown Key Input: %d", ch);
         out = 0;
@@ -960,6 +978,116 @@ int dropitem(dungeon_type *d)
     }
 }
 
+void inspect(dungeon_type *d)
+{
+    char header[100];
+
+    sprintf(header, "What item would you like to inspect (enter 0-9)");
+    object selected_object;
+    int carry_index;
+    while (1)
+    {
+        for (int i = 0; i < 79; i++)
+        {
+            mvaddch(0, i, ' ');
+        }
+
+        for (int i = 0; i < strlen(header); i++)
+        {
+            mvaddch(0, i, header[i]);
+        }
+
+        refresh();
+
+        int ch = getch();
+
+        switch (ch)
+        {
+        case '0':
+            selected_object = d->PC.carry[0];
+            carry_index = 0;
+            break;
+        case '1':
+            selected_object = d->PC.carry[1];
+            carry_index = 1;
+            break;
+        case '2':
+            selected_object = d->PC.carry[2];
+            carry_index = 2;
+            break;
+        case '3':
+            selected_object = d->PC.carry[3];
+            carry_index = 3;
+            break;
+        case '4':
+            selected_object = d->PC.carry[4];
+            carry_index = 4;
+            break;
+        case '5':
+            selected_object = d->PC.carry[5];
+            carry_index = 5;
+            break;
+        case '6':
+            selected_object = d->PC.carry[6];
+            carry_index = 6;
+            break;
+        case '7':
+            selected_object = d->PC.carry[7];
+            carry_index = 7;
+            break;
+        case '8':
+            selected_object = d->PC.carry[8];
+            carry_index = 8;
+            break;
+        case '9':
+            selected_object = d->PC.carry[9];
+            carry_index = 9;
+            break;
+        case 27: //escape key
+
+            return;
+        default:
+            sprintf(header, "Unknown Key Input: %d", ch);
+            continue;
+            break;
+        }
+
+        if (selected_object.type == objtype_no_type)
+        {
+            sprintf(header, "No object there... try again.");
+            continue;
+        }
+
+        break;
+    }
+
+    int done = 0;
+    while (!done)
+    {
+        char monster_string[100];
+        sprintf(monster_string, "Description:");
+        clear();
+        for (int i = 0; i < strlen(monster_string); i++)
+        {
+            mvaddch(0, i, monster_string[i]);
+        }
+
+        for (int i = 0; i < selected_object.description.length(); i++)
+        {
+            int row = (i / 80) + 1;
+            mvaddch(row, i % 80, selected_object.description.at(i));
+        }
+
+        refresh();
+        int ch2 = getch();
+
+        if (ch2 == 27)
+        {
+            done = 1;
+        }
+    }
+}
+
 void listinventory(dungeon_type *d)
 {
 
@@ -1198,6 +1326,147 @@ void teleportPC(dungeon_type *d)
 
     d->PC.pos.x = newPos.x;
     d->PC.pos.y = newPos.y;
+}
+
+int inspectMonster(dungeon_type *d)
+{
+    position newPos;
+    newPos.x = d->PC.pos.x;
+    newPos.y = d->PC.pos.y;
+
+    while (1)
+    {
+
+        printDungeon(d);
+        mvaddch(newPos.y + 1, newPos.x, '*');
+        refresh();
+        int ch = getch();
+
+        uint8_t yNext = newPos.y;
+        uint8_t xNext = newPos.x;
+        int out = 0;
+
+        switch (ch)
+        {
+        case '7':
+        case 'y':
+            yNext--;
+            xNext--;
+            break;
+        case '8':
+        case 'k':
+            yNext--;
+            break;
+        case '9':
+        case 'u':
+
+            yNext--;
+            xNext++;
+            break;
+        case '6':
+        case 'l':
+
+            xNext++;
+            break;
+        case '3':
+        case 'n':
+            yNext++;
+            xNext++;
+            break;
+        case '2':
+        case 'j':
+            yNext++;
+            break;
+        case '1':
+        case 'b':
+            yNext++;
+            xNext--;
+            break;
+        case '4':
+        case 'h':
+            xNext--;
+            break;
+        case 't':
+            out = 1;
+            break;
+        case 27: //escape key
+
+            return 0;
+        }
+
+        if (out)
+        {
+            break;
+        }
+
+        if ((xNext >= 0 && xNext < DUNGEON_X) && (yNext >= 0 && yNext < DUNGEON_Y) && d->map[yNext][xNext].hardness != 255)
+        {
+            newPos.x = xNext;
+            newPos.y = yNext;
+        }
+    }
+    npc selected_monster = npc();
+
+    for (int i = 0; i < d->num_monsters; i++)
+    {
+        if (d->monsters[i].pos.x == newPos.x && d->monsters[i].pos.y == newPos.y)
+        {
+            selected_monster = d->monsters[i];
+        }
+    }
+
+    if (selected_monster.rarity == 0)
+    {
+        return -1;
+    }
+
+    int done = 0;
+    while (!done)
+    {
+        char monster_string[100];
+        sprintf(monster_string, "Name: %s", selected_monster.name.c_str());
+        clear();
+        for (int i = 0; i < strlen(monster_string); i++)
+        {
+            mvaddch(0, i, monster_string[i]);
+        }
+
+        std::string symbol = "Symbol: ";
+        symbol.push_back(selected_monster.to_string);
+
+        for (int i = 0; i < symbol.length(); i++)
+        {
+            if (i == symbol.length() - 1)
+            {
+
+                attron(COLOR_PAIR(selected_monster.color));
+                mvaddch(1, i, symbol.at(i));
+                attroff(COLOR_PAIR(selected_monster.color));
+            }
+            else
+            {
+                mvaddch(1, i, symbol.at(i));
+            }
+        }
+
+        std::string description = "Description: " + selected_monster.description;
+
+        for (int i = 0; i < description.length(); i++)
+        {
+            int row = (i / 80) + 2;
+            mvaddch(row, i % 80, description.at(i));
+        }
+
+        refresh();
+        int ch2 = getch();
+
+        if (ch2 == 27)
+        {
+            done = 1;
+        }
+    }
+
+    return 1;
 }
 
 void printFogDungeon(dungeon_type *d)
