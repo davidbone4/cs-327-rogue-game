@@ -28,6 +28,7 @@ void listinventory(dungeon_type *d);
 void listcarry(dungeon_type *d);
 void inspect(dungeon_type *d);
 int inspectMonster(dungeon_type *d);
+void win_game();
 
 int main(int argc, char const *argv[])
 {
@@ -574,6 +575,10 @@ int player_turn(dungeon_type *d)
             if (d->monsters[i].hitpoints <= 0)
             {
                 d->monsters[i].alive = 0;
+
+                if(d->monsters[i].type[BOSS]){
+                    win_game();
+                }
             }
 
             //TODO if you kill the boss you win
@@ -615,6 +620,55 @@ void io_init_terminal(void)
     noecho();
     curs_set(0);
     keypad(stdscr, TRUE);
+}
+
+void win_game(){
+
+    const char *victory =
+  "\n                                       o\n"
+  "                                      $\"\"$o\n"
+  "                                     $\"  $$\n"
+  "                                      $$$$\n"
+  "                                      o \"$o\n"
+  "                                     o\"  \"$\n"
+  "                oo\"$$$\"  oo$\"$ooo   o$    \"$    ooo\"$oo  $$$\"o\n"
+  "   o o o o    oo\"  o\"      \"o    $$o$\"     o o$\"\"  o$      \"$  "
+  "\"oo   o o o o\n"
+  "   \"$o   \"\"$$$\"   $$         $      \"   o   \"\"    o\"         $"
+  "   \"o$$\"    o$$\n"
+  "     \"\"o       o  $          $\"       $$$$$       o          $  ooo"
+  "     o\"\"\n"
+  "        \"o   $$$$o $o       o$        $$$$$\"       $o        \" $$$$"
+  "   o\"\n"
+  "         \"\"o $$$$o  oo o  o$\"         $$$$$\"        \"o o o o\"  "
+  "\"$$$  $\n"
+  "           \"\" \"$\"     \"\"\"\"\"            \"\"$\"            \""
+  "\"\"      \"\"\" \"\n"
+  "            \"oooooooooooooooooooooooooooooooooooooooooooooooooooooo$\n"
+  "             \"$$$$\"$$$$\" $$$$$$$\"$$$$$$ \" \"$$$$$\"$$$$$$\"  $$$\""
+  "\"$$$$\n"
+  "              $$$oo$$$$   $$$$$$o$$$$$$o\" $$$$$$$$$$$$$$ o$$$$o$$$\"\n"
+  "              $\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\""
+  "\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"$\n"
+  "              $\"                                                 \"$\n"
+  "              $\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\""
+  "$\"$\"$\"$\"$\"$\"$\"$\n"
+  "                                   You win!\n\n";
+
+    int row = 0;
+    for (int i = 0; i < strlen(victory); i++)
+    {
+        if(victory[i] == '\n'){
+            row++;
+            continue;
+        }
+        mvaddch(row, i, victory[i]);
+    }
+    refresh();
+    int ch = getch();
+    endwin();
+    exit(0);
+
 }
 
 void end_game()

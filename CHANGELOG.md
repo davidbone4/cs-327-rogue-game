@@ -130,3 +130,4 @@
     => added hp logic for equipment
     => allowed enemies to hit you
     => added hp bars of the Player and the last hit npc at the bottom of the screen
+    => added the win condition for killing the boss
