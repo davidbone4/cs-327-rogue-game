@@ -23,6 +23,9 @@ objects_inventory equip(dungeon_type *d);
 objects_inventory getinventoryslot(dungeon_type *d, object o);
 int unequip(dungeon_type *d);
 int dropitem(dungeon_type *d);
+int deleteitem(dungeon_type *d);
+void listinventory(dungeon_type *d);
+void listcarry(dungeon_type *d);
 
 int main(int argc, char const *argv[])
 {
@@ -486,6 +489,28 @@ int player_turn(dungeon_type *d)
         out = 0;
         break;
     }
+    case 'x':
+    {
+        int slot = deleteitem(d);
+        if (slot >= 0)
+        {
+            sprintf(header, "Deleted the object in the %d carry slot", slot);
+        }
+        out = 0;
+        break;
+    }
+    case 'i':
+    {
+        listinventory(d);
+        out = 0;
+        break;
+    }
+    case 'e':
+    {
+        listcarry(d);
+        out = 0;
+        break;
+    }
     default:
         sprintf(header, "Unknown Key Input: %d", ch);
         out = 0;
@@ -739,6 +764,92 @@ int unequip(dungeon_type *d)
     }
 }
 
+int deleteitem(dungeon_type *d)
+{
+    char header[100];
+
+    sprintf(header, "What item would you like to delete (enter 0-9)");
+    while (1)
+    {
+        for (int i = 0; i < 79; i++)
+        {
+            mvaddch(0, i, ' ');
+        }
+
+        for (int i = 0; i < strlen(header); i++)
+        {
+            mvaddch(0, i, header[i]);
+        }
+
+        refresh();
+
+        int carry_index;
+        int ch = getch();
+        object selected_object;
+
+        switch (ch)
+        {
+        case '0':
+            selected_object = d->PC.carry[0];
+            carry_index = 0;
+            break;
+        case '1':
+            selected_object = d->PC.carry[1];
+            carry_index = 1;
+            break;
+        case '2':
+            selected_object = d->PC.carry[2];
+            carry_index = 2;
+            break;
+        case '3':
+            selected_object = d->PC.carry[3];
+            carry_index = 3;
+            break;
+        case '4':
+            selected_object = d->PC.carry[4];
+            carry_index = 4;
+            break;
+        case '5':
+            selected_object = d->PC.carry[5];
+            carry_index = 5;
+            break;
+        case '6':
+            selected_object = d->PC.carry[6];
+            carry_index = 6;
+            break;
+        case '7':
+            selected_object = d->PC.carry[7];
+            carry_index = 7;
+            break;
+        case '8':
+            selected_object = d->PC.carry[8];
+            carry_index = 8;
+            break;
+        case '9':
+            selected_object = d->PC.carry[9];
+            carry_index = 9;
+            break;
+        case 27: //escape key
+
+            return NOTYPE;
+        default:
+            sprintf(header, "Unknown Key Input: %d", ch);
+            continue;
+            break;
+        }
+
+        if (selected_object.type == objtype_no_type)
+        {
+            sprintf(header, "No object there... try again.");
+            continue;
+        }
+
+        d->PC.carry[carry_index] = object();
+
+        return carry_index;
+    }
+}
+
 int dropitem(dungeon_type *d)
 {
     char header[100];
@@ -846,6 +957,121 @@ int dropitem(dungeon_type *d)
         }
 
         return -1;
+    }
+}
+
+void listinventory(dungeon_type *d)
+{
+
+    int done = 0;
+    while (!done)
+    {
+        char monster_string[100];
+        sprintf(monster_string, "Inventory:");
+        clear();
+        for (int i = 0; i < strlen(monster_string); i++)
+        {
+            mvaddch(0, i, monster_string[i]);
+        }
+        for (int i = 0; i < 12; i++)
+        {
+            std::string dictionaryalpha = "abcdefghijkl";
+            std::string dictionary[12] = {
+                "WEAPON",
+                "OFFHAND",
+                "RANGED",
+                "ARMOR",
+                "HELMET",
+                "CLOAK",
+                "GLOVES",
+                "BOOTS",
+                "AMULET",
+                "LIGHT",
+                "RING_1",
+                "RING_2",
+            };
+
+            if (d->PC.inventory[i].type != objtype_no_type)
+            {
+                sprintf(monster_string, "%s (%c): %s", dictionary[i].c_str(), dictionaryalpha.at(i), d->PC.inventory[i].name.c_str());
+            }
+            else
+            {
+                sprintf(monster_string, "%s (%c): nothing", dictionary[i].c_str(), dictionaryalpha.at(i));
+            }
+
+            for (int j = 0; j < strlen(monster_string); j++)
+            {
+
+                mvaddch(i + 1, j, monster_string[j]);
+            }
+        }
+
+        refresh();
+        int ch2 = getch();
+
+        if (ch2 == 27)
+        {
+            done = 1;
+        }
+    }
+}
+
+void listcarry(dungeon_type *d)
+{
+
+    int done = 0;
+    while (!done)
+    {
+        char monster_string[100];
+        sprintf(monster_string, "Carrying:");
+        clear();
+        for (int i = 0; i < strlen(monster_string); i++)
+        {
+            mvaddch(0, i, monster_string[i]);
+        }
+        for (int i = 0; i < 10; i++)
+        {
+            std::string dictionaryalpha = "0123456789";
+            std::string dictionary[12] = {
+                "WEAPON",
+                "OFFHAND",
+                "RANGED",
+                "ARMOR",
+                "HELMET",
+                "CLOAK",
+                "GLOVES",
+                "BOOTS",
+                "AMULET",
+                "LIGHT",
+                "RING_1",
+                "RING_2",
+            };
+
+            if (d->PC.carry[i].type != objtype_no_type)
+            {
+                int typeindex = getinventoryslot(d, d->PC.carry[i]);
+                sprintf(monster_string, "%c: %s (%s)", dictionaryalpha.at(i), d->PC.carry[i].name.c_str(), dictionary[typeindex].c_str());
+            }
+            else
+            {
+                sprintf(monster_string, "%c: nothing", dictionaryalpha.at(i));
+            }
+
+            for (int j = 0; j < strlen(monster_string); j++)
+            {
+
+                mvaddch(i + 1, j, monster_string[j]);
+            }
+        }
+
+        refresh();
+        int ch2 = getch();
+
+        if (ch2 == 27)
+        {
+            done = 1;
+        }
     }
 }
 

@@ -119,3 +119,7 @@
     => finished the 'w' equip command.
 4/12/2021
     => finished the 't' unequip command.
+    => finished the 'd' drop command
+    => finished the 'x' delete command
+    => finished the 'i' list inventory command
+    => finished the 'e' carrying inventory
