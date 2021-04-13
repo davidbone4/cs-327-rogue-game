@@ -28,6 +28,22 @@ typedef enum
     DOWN
 } cellState;
 
+typedef enum
+{
+    WEAPON,
+    OFFHAND,
+    RANGED,
+    ARMOR,
+    HELMET,
+    CLOAK,
+    GLOVES,
+    BOOTS,
+    AMULET,
+    LIGHT,
+    RING_1,
+    RING_2,
+    NOTYPE = -1
+} objects_inventory;
 typedef enum dim
 {
     dim_x,
@@ -77,31 +93,26 @@ public:
     uint32_t color;
     uint32_t abilities;
     int speed_from_file;
-    uint32_t hitpoints;
+    int32_t hitpoints;
+    int32_t max_hitpoints;
     dice damage;
     uint32_t rarity;
 
     npc() : name(), description(), to_string(0), color(0),
-                          abilities(0), speed_from_file(), hitpoints(), damage(),
-                          rarity(0)
-  {
-  }
-  void set(const std::string &name,
-           const std::string &description,
-           const char symbol,
-           const uint32_t &color,
-           const uint32_t &speed,
-           const uint32_t abilities,
-           const uint32_t &hitpoints,
-           const dice &damage,
-           const uint32_t rarity);
+            abilities(0), speed_from_file(), hitpoints(), max_hitpoints(),damage(),
+            rarity(0)
+    {
+    }
+    void set(const std::string &name,
+             const std::string &description,
+             const char symbol,
+             const uint32_t &color,
+             const uint32_t &speed,
+             const uint32_t abilities,
+             const int32_t &hitpoints,
+             const dice &damage,
+             const uint32_t rarity);
 } npc;
-
-typedef class pc : public character
-{
-public:
-    cell map[DUNGEON_Y][DUNGEON_X];
-} pc;
 
 typedef struct object
 {
@@ -109,17 +120,20 @@ public:
     std::string name, description;
     object_type_t type;
     uint32_t color;
-    uint32_t hit, dodge, defence, weight, speed, attribute, value;
+    uint32_t dodge, defence, weight, speed, attribute, value;
+    uint32_t hit;
     bool artifact;
     dice damage;
     uint32_t rarity;
     position pos;
+    bool picked_up;
+    int position_in_dungeon;
 
     object() : name(), description(), type(objtype_no_type),
-                           color(0), hit(), damage(),
-                           dodge(), defence(), weight(),
-                           speed(), attribute(), value(),
-                           artifact(false), rarity(0), pos()
+               color(0), hit(), damage(dice(0,0,1)),
+               dodge(), defence(), weight(),
+               speed(0), attribute(), value(),
+               artifact(false), rarity(0), pos(), picked_up(),position_in_dungeon()
     {
     }
     void set(const std::string &name,
@@ -136,9 +150,21 @@ public:
              const uint32_t &value,
              const bool artifact,
              const uint32_t rarity,
-             const position pos);
+             const position pos,
+             const bool picked_up,
+             const int position_in_dungeon);
 
 } object;
+
+typedef class pc : public character
+{
+public:
+    cell map[DUNGEON_Y][DUNGEON_X];
+    int32_t hp;
+    dice damage;
+    object inventory[12];
+    object carry[10];
+} pc;
 
 typedef class dungeon
 {

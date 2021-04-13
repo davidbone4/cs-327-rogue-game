@@ -112,3 +112,22 @@
     => fixed unique monsters and artifacts
     => tested on Ubuntu
     => turned in Assignment 1.08
+4/11/2021
+    => added inventory and carry space to pc
+    => added is picked_up boolean to object
+    => implemented auto pick up for objects on the map
+    => finished the 'w' equip command.
+4/12/2021
+    => finished the 't' unequip command.
+    => finished the 'd' drop command
+    => finished the 'x' delete command
+    => finished the 'i' list inventory command
+    => finished the 'e' carrying command
+    => finished the 'I' inspect command
+    => finished the 'L' Look command
+    => added the speed of inventory
+    => disabled NPC vs NPC
+    => added hp logic for equipment
+    => allowed enemies to hit you
+    => added hp bars of the Player and the last hit npc at the bottom of the screen
+    => added the win condition for killing the boss

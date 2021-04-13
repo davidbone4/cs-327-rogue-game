@@ -20,6 +20,8 @@ void movemonsternontunneling(dungeon_type *d, npc *m);
 void move_monster_tunneling(dungeon_type *d, npc *m);
 void run_game(dungeon_type *d);
 int rand_in_range(int min, int max);
+void monsterFight(dungeon_type *d, npc *m);
+
 const char *string_type(uint32_t num);
 
 void npc::set(const std::string &name,
@@ -28,7 +30,7 @@ void npc::set(const std::string &name,
               const uint32_t &color,
               const uint32_t &speed,
               const uint32_t abilities,
-              const uint32_t &hitpoints,
+              const int32_t &hitpoints,
               const dice &damage,
               const uint32_t rarity)
 {
@@ -39,6 +41,7 @@ void npc::set(const std::string &name,
     this->speed_from_file = speed;
     this->abilities = abilities;
     this->hitpoints = hitpoints;
+    this->max_hitpoints = hitpoints;
     this->damage = damage;
     this->rarity = rarity;
 }
@@ -57,7 +60,9 @@ void object::set(const std::string &name,
                  const uint32_t &value,
                  const bool artifact,
                  const uint32_t rarity,
-                 const position pos)
+                 const position pos,
+                 const bool picked_up,
+                 const int position_in_dungeon)
 {
     this->name = name;
     this->description = description;
@@ -74,6 +79,8 @@ void object::set(const std::string &name,
     this->value = value;
     this->artifact = artifact;
     this->pos = pos;
+    this->picked_up = picked_up;
+    this->position_in_dungeon = position_in_dungeon;
 }
 
 int rand_in_range(int min, int max)
@@ -111,7 +118,8 @@ heap_t init_monsters(dungeon_type *d, int numMonsters)
         {
             desc = d->monster_descriptions.at(rand_in_range(0, d->monster_descriptions.size() - 1));
 
-            if(std::bitset<9>(desc.abilities).to_string().c_str()[UNIQUE] == '1' && unique_spawned){
+            if (std::bitset<9>(desc.abilities).to_string().c_str()[UNIQUE] == '1' && unique_spawned)
+            {
                 continue;
             }
 
@@ -128,7 +136,8 @@ heap_t init_monsters(dungeon_type *d, int numMonsters)
         monsters[i].speed = monsters[i].speed_from_file;
         monsters[i].type = std::bitset<9>(monsters[i].abilities).to_string().c_str();
 
-        if(monsters[i].type[UNIQUE]){
+        if (monsters[i].type[UNIQUE])
+        {
             unique_spawned = 1;
         }
 
@@ -181,7 +190,8 @@ void init_objects(dungeon_type *d)
         {
             desc = d->object_descriptions.at(rand_in_range(0, d->object_descriptions.size() - 1));
 
-            if(desc.artifact && artifact_spawned){
+            if (desc.artifact && artifact_spawned)
+            {
                 continue;
             }
 
@@ -193,22 +203,21 @@ void init_objects(dungeon_type *d)
             }
         }
 
-        if(desc.artifact){
+        if (desc.artifact)
+        {
             artifact_spawned = true;
         }
-
-
 
         while (1)
         {
             int Y = (rand() % (DUNGEON_Y - 1)) + 1;
             int X = (rand() % (DUNGEON_X - 1)) + 1;
-            if (d->map[Y][X].type == ROOM  )
+            if (d->map[Y][X].type == ROOM)
             {
                 position pos;
                 pos.y = Y;
                 pos.x = X;
-                objects[i].set(desc.name, desc.description, desc.type, desc.color, desc.hit.roll(), desc.damage, desc.dodge.roll(), desc.defence.roll(),desc.weight.roll(),desc.speed.roll(),desc.attribute.roll(),desc.value.roll(),desc.artifact, desc.rarity, pos);
+                objects[i].set(desc.name, desc.description, desc.type, desc.color, desc.hit.roll(), desc.damage, desc.dodge.roll(), desc.defence.roll(), desc.weight.roll(), desc.speed.roll(), desc.attribute.roll(), desc.value.roll(), desc.artifact, desc.rarity, pos, false, i);
 
                 break;
             }
@@ -217,7 +226,6 @@ void init_objects(dungeon_type *d)
 
     d->objects = objects;
     d->num_objects = numObjects;
-
 }
 
 static int32_t monster_cmp(const void *key, const void *with)
@@ -405,13 +413,37 @@ void movemonsternontunneling(dungeon_type *d, npc *m)
     {
         if (d->PC.pos.y == nextY && d->PC.pos.x == nextX)
         {
-            d->PC.alive = 0;
+
+            monsterFight(d, m);
         }
         for (int i = 0; i < d->num_monsters; i++)
         {
             if (d->monsters[i].pos.y == nextY && d->monsters[i].pos.x == nextX)
             {
-                d->monsters[i].alive = 0;
+                while (1)
+                {
+                    int randY, randX;
+                    randY = (rand() % 3) + (d->monsters[i].pos.y - 1);
+                    randX = (rand() % 3) + (d->monsters[i].pos.x - 1);
+                    if ((randY == d->monsters[i].pos.y && randX == d->monsters[i].pos.x) || d->map[randY][randX].type == ROCK)
+                    {
+                        continue;
+                    }
+
+                    bool contin = false;
+                    for (int i = 0; i < d->num_monsters; i++)
+                    {
+                        if (d->monsters[i].pos.y == randY && d->monsters[i].pos.x == randX)
+                        {
+                            contin = true;
+                        }
+                    }
+                    if (contin)
+                        continue;
+                    d->monsters[i].pos.x = randX;
+                    d->monsters[i].pos.y = randY;
+                    break;
+                }
             }
             if (d->monsters[i].pos.y == m->pos.y && d->monsters[i].pos.x == m->pos.x)
             {
@@ -607,13 +639,36 @@ void move_monster_tunneling(dungeon_type *d, npc *m)
     {
         if (d->PC.pos.y == nextY && d->PC.pos.x == nextX)
         {
-            d->PC.alive = 0;
+            monsterFight(d, m);
         }
         for (int i = 0; i < d->num_monsters; i++)
         {
             if (d->monsters[i].pos.y == nextY && d->monsters[i].pos.x == nextX)
             {
-                d->monsters[i].alive = 0;
+                while (1)
+                {
+                    int randY, randX;
+                    randY = (rand() % 3) + (d->monsters[i].pos.y - 1);
+                    randX = (rand() % 3) + (d->monsters[i].pos.x - 1);
+                    if ((randY == d->monsters[i].pos.y && randX == d->monsters[i].pos.x) || d->map[randY][randX].type == ROCK)
+                    {
+                        continue;
+                    }
+
+                    bool contin = false;
+                    for (int i = 0; i < d->num_monsters; i++)
+                    {
+                        if (d->monsters[i].pos.y == randY && d->monsters[i].pos.x == randX)
+                        {
+                            contin = true;
+                        }
+                    }
+                    if (contin)
+                        continue;
+                    d->monsters[i].pos.x = randX;
+                    d->monsters[i].pos.y = randY;
+                    break;
+                }
             }
             if (d->monsters[i].pos.y == m->pos.y && d->monsters[i].pos.x == m->pos.x)
             {
@@ -621,6 +676,16 @@ void move_monster_tunneling(dungeon_type *d, npc *m)
                 d->monsters[i].pos.x = nextX;
             }
         }
+    }
+}
+
+void monsterFight(dungeon_type *d, npc *m)
+{
+
+    d->PC.hp -= m->damage.roll();
+    if (d->PC.hp <= 0)
+    {
+        d->PC.alive = 0;
     }
 }
 

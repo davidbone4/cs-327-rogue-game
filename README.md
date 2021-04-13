@@ -1,5 +1,20 @@
 # cs-327-rogue-game by David bone
 
+## Assignment 1.09
+
+The penutlimate assignment had me adding many object related commands to the dungeon. All now work as outlined in the assignment pdf. All must be used when looking at the dungeon and not having any other commands open. For instance, when the game is prompting the user for a carry slot after pressing the 'w' command, you cannot immediately look at the inventory, you must first press esc to cancel the wear command. All commands may be cancelled or exited using escape.
+
+At the bottom of the screen, the player health will always be displayed, followed by the last damaged monster or the first monster in the dungeon array if no monster has been damaged. All damage, speed and health calculations work as outlined.
+
+The game is won by killing a BOSS (spongebob squarepants), but that may be very difficult, as the BOSSes are rare. Once this happens, the game displays the 'crown' win graphic and then exits.
+
+USAGE:
+
+    >make
+    > ./rlg327 --nummon <desired integer of monsters>
+
+Tested on Ubuntu
+
 ## Assignment 1.08
 
 This assignment had me using the new file parsing to add different types of monsters and objects to the dungeon.
