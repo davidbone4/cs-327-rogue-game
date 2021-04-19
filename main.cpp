@@ -1517,7 +1517,7 @@ void armorShop(dungeon_type *d)
         }
         for (int i = 0; i < 3; i++)
         {
-            sprintf(monster_string, "[%d]: %c, %s COST: %d", i + 1, object_symbol[d->objects[i].type], objects[i].name.c_str(), objects[i].value);
+            sprintf(monster_string, "[%d]: %c, %s COST: %d", i + 1, object_symbol[objects[i].type], objects[i].name.c_str(), objects[i].value);
 
             for (int j = 0; j < strlen(monster_string); j++)
             {
