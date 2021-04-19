@@ -1,5 +1,28 @@
 # cs-327-rogue-game by David bone
 
+## Assignment 1.10
+
+Here is my final assignment for my Rouge-like game.
+
+For this assignment, I decided to flesh out the 'value' aspect of objects by creating a buy and sell mechanic, complete with PC money and a town you can visit to spend said money on loot or potions to heal yourself.
+
+To sell an item, from the main screen, press 's'. You are them prompted for a carry slot to sell from. This method works like the delete method, however it increments your money with the value of the sold object
+
+To spend your money, from the main screen, press 'c'. This teleports you to a town with two places to visit, the Armor store and Thielen student health center. To enter a store, use the same movement keys from the game to move along the street. Then enter a door of one of the stores. Press Escape to leave town.
+
+In the armor shop, you are presented with 3 randomly generated items that you can purchase for the displayed cost. Buying an item places it in the first available carry spot. Press escape to leave the store.
+
+In Thielen, you can buy health items to immediately regenerate health. The minor health potion regenerates 50 health, the major health potion regenerates 100 health, and the coveted Clone Cone brings you to max health. Press escape to leave Thielen.
+
+USAGE:
+
+    >make
+    > ./rlg327 --nummon <desired integer of monsters>
+
+Tested on Ubuntu
+
+PS: thank you for all your hard work as a TA for this class. It has been a very fun class and my favorite of the semester by far.
+
 ## Assignment 1.09
 
 The penultimate assignment had me adding many object related commands to the dungeon. All now work as outlined in the assignment pdf. All must be used when looking at the dungeon and not having any other commands open. For instance, when the game is prompting the user for a carry slot after pressing the 'w' command, you cannot immediately look at the inventory, you must first press esc to cancel the wear command. All commands may be cancelled or exited using escape.

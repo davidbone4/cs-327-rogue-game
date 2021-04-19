@@ -161,6 +161,7 @@ typedef class pc : public character
 public:
     cell map[DUNGEON_Y][DUNGEON_X];
     int32_t hp;
+    int32_t money;
     dice damage;
     object inventory[12];
     object carry[10];
