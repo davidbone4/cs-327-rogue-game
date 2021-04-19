@@ -131,3 +131,16 @@
     => allowed enemies to hit you
     => added hp bars of the Player and the last hit npc at the bottom of the screen
     => added the win condition for killing the boss
+4/18/2021
+    => added money to the PC class
+    => added the display of money to the front screen
+    => implemented a sell feature by pressing 's'
+    => made ACSII art to create the town
+    => implemented a town method to allow the player to visit it by pressing 'c' and move around the street
+    => fixed town render issue
+    => created a shop that dynamically populates every time a player enters
+    => allowed player to buy from the shop
+    => created thielen where players can pay to heal
+    => fixed issue where you could buy a heal when at max health
+    => tested on Ubuntu
+    => turned in Assignment 1.10

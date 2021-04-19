@@ -5,6 +5,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <cmath>
+#include <algorithm>
 
 #include "dungeondefinitions.h"
 
@@ -28,8 +29,11 @@ void listinventory(dungeon_type *d);
 void listcarry(dungeon_type *d);
 void inspect(dungeon_type *d);
 int inspectMonster(dungeon_type *d);
+int sellitem(dungeon_type *d);
+void gotoTown(dungeon_type *d);
+void armorShop(dungeon_type *d);
+void visithealthcenter(dungeon_type *d);
 void win_game();
-
 int main(int argc, char const *argv[])
 {
 
@@ -81,6 +85,7 @@ int main(int argc, char const *argv[])
     dungeon.PC.isNPC = 0;
     dungeon.PC.hp = 200;
     dungeon.PC.damage = dice(0, 1, 4);
+    dungeon.PC.money = 0;
 
     for (int i = 0; i < 12; i++)
     {
@@ -215,6 +220,19 @@ int player_turn(dungeon_type *d)
     for (int i = 0; i < hp.length(); i++)
     {
         mvaddch(22, i, hp.at(i));
+    }
+
+    std::string coins = "Player Money: ";
+    coins += std::to_string(d->PC.money);
+    coins += " coins";
+    for (int i = 0; i < hp.length(); i++)
+    {
+        mvaddch(22, i, hp.at(i));
+    }
+
+    for (int i = 80 - coins.length(); i < 80; i++)
+    {
+        mvaddch(22, i, coins.at(i - (80 - coins.length())));
     }
     // for (int i = 0; i < strlen(placeholder); i++)
     // {
@@ -513,6 +531,21 @@ int player_turn(dungeon_type *d)
         out = 0;
         break;
     }
+    case 's':
+    {
+        int slot = sellitem(d);
+        if (slot >= 0)
+        {
+            sprintf(header, "Sold the object in the %d carry slot", slot);
+        }
+        out = 0;
+        break;
+    }
+    case 'c':
+        gotoTown(d);
+        out = 0;
+        break;
+
     case 'i':
     {
         listinventory(d);
@@ -576,7 +609,8 @@ int player_turn(dungeon_type *d)
             {
                 d->monsters[i].alive = 0;
 
-                if(d->monsters[i].type[BOSS]){
+                if (d->monsters[i].type[BOSS])
+                {
                     win_game();
                 }
             }
@@ -622,53 +656,58 @@ void io_init_terminal(void)
     keypad(stdscr, TRUE);
 }
 
-void win_game(){
+void win_game()
+{
 
     const char *victory =
-  "\n                                       o\n"
-  "                                      $\"\"$o\n"
-  "                                     $\"  $$\n"
-  "                                      $$$$\n"
-  "                                      o \"$o\n"
-  "                                     o\"  \"$\n"
-  "                oo\"$$$\"  oo$\"$ooo   o$    \"$    ooo\"$oo  $$$\"o\n"
-  "   o o o o    oo\"  o\"      \"o    $$o$\"     o o$\"\"  o$      \"$  "
-  "\"oo   o o o o\n"
-  "   \"$o   \"\"$$$\"   $$         $      \"   o   \"\"    o\"         $"
-  "   \"o$$\"    o$$\n"
-  "     \"\"o       o  $          $\"       $$$$$       o          $  ooo"
-  "     o\"\"\n"
-  "        \"o   $$$$o $o       o$        $$$$$\"       $o        \" $$$$"
-  "   o\"\n"
-  "         \"\"o $$$$o  oo o  o$\"         $$$$$\"        \"o o o o\"  "
-  "\"$$$  $\n"
-  "           \"\" \"$\"     \"\"\"\"\"            \"\"$\"            \""
-  "\"\"      \"\"\" \"\n"
-  "            \"oooooooooooooooooooooooooooooooooooooooooooooooooooooo$\n"
-  "             \"$$$$\"$$$$\" $$$$$$$\"$$$$$$ \" \"$$$$$\"$$$$$$\"  $$$\""
-  "\"$$$$\n"
-  "              $$$oo$$$$   $$$$$$o$$$$$$o\" $$$$$$$$$$$$$$ o$$$$o$$$\"\n"
-  "              $\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\""
-  "\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"$\n"
-  "              $\"                                                 \"$\n"
-  "              $\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\""
-  "$\"$\"$\"$\"$\"$\"$\"$\n"
-  "                                   You win!\n\n";
+        "\n                                       o\n"
+        "                                      $\"\"$o\n"
+        "                                     $\"  $$\n"
+        "                                      $$$$\n"
+        "                                      o \"$o\n"
+        "                                     o\"  \"$\n"
+        "                oo\"$$$\"  oo$\"$ooo   o$    \"$    ooo\"$oo  $$$\"o\n"
+        "   o o o o    oo\"  o\"      \"o    $$o$\"     o o$\"\"  o$      \"$  "
+        "\"oo   o o o o\n"
+        "   \"$o   \"\"$$$\"   $$         $      \"   o   \"\"    o\"         $"
+        "   \"o$$\"    o$$\n"
+        "     \"\"o       o  $          $\"       $$$$$       o          $  ooo"
+        "     o\"\"\n"
+        "        \"o   $$$$o $o       o$        $$$$$\"       $o        \" $$$$"
+        "   o\"\n"
+        "         \"\"o $$$$o  oo o  o$\"         $$$$$\"        \"o o o o\"  "
+        "\"$$$  $\n"
+        "           \"\" \"$\"     \"\"\"\"\"            \"\"$\"            \""
+        "\"\"      \"\"\" \"\n"
+        "            \"oooooooooooooooooooooooooooooooooooooooooooooooooooooo$\n"
+        "             \"$$$$\"$$$$\" $$$$$$$\"$$$$$$ \" \"$$$$$\"$$$$$$\"  $$$\""
+        "\"$$$$\n"
+        "              $$$oo$$$$   $$$$$$o$$$$$$o\" $$$$$$$$$$$$$$ o$$$$o$$$\"\n"
+        "              $\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\""
+        "\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"$\n"
+        "              $\"                                                 \"$\n"
+        "              $\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\""
+        "$\"$\"$\"$\"$\"$\"$\"$\n"
+        "                                   You win!\n\n";
 
+    clear();
     int row = 0;
+    int col = 0;
     for (int i = 0; i < strlen(victory); i++)
     {
-        if(victory[i] == '\n'){
+        if (victory[i] == '\n')
+        {
             row++;
+            col = 0;
             continue;
         }
-        mvaddch(row, i, victory[i]);
+        mvaddch(row, col, victory[i]);
+        col++;
     }
     refresh();
     int ch = getch();
     endwin();
     exit(0);
-
 }
 
 void end_game()
@@ -977,6 +1016,93 @@ int deleteitem(dungeon_type *d)
     }
 }
 
+int sellitem(dungeon_type *d)
+{
+    char header[100];
+
+    sprintf(header, "What item would you like to sell? (enter 0-9)");
+    while (1)
+    {
+        for (int i = 0; i < 79; i++)
+        {
+            mvaddch(0, i, ' ');
+        }
+
+        for (int i = 0; i < strlen(header); i++)
+        {
+            mvaddch(0, i, header[i]);
+        }
+
+        refresh();
+
+        int carry_index;
+        int ch = getch();
+        object selected_object;
+
+        switch (ch)
+        {
+        case '0':
+            selected_object = d->PC.carry[0];
+            carry_index = 0;
+            break;
+        case '1':
+            selected_object = d->PC.carry[1];
+            carry_index = 1;
+            break;
+        case '2':
+            selected_object = d->PC.carry[2];
+            carry_index = 2;
+            break;
+        case '3':
+            selected_object = d->PC.carry[3];
+            carry_index = 3;
+            break;
+        case '4':
+            selected_object = d->PC.carry[4];
+            carry_index = 4;
+            break;
+        case '5':
+            selected_object = d->PC.carry[5];
+            carry_index = 5;
+            break;
+        case '6':
+            selected_object = d->PC.carry[6];
+            carry_index = 6;
+            break;
+        case '7':
+            selected_object = d->PC.carry[7];
+            carry_index = 7;
+            break;
+        case '8':
+            selected_object = d->PC.carry[8];
+            carry_index = 8;
+            break;
+        case '9':
+            selected_object = d->PC.carry[9];
+            carry_index = 9;
+            break;
+        case 27: //escape key
+
+            return NOTYPE;
+        default:
+            sprintf(header, "Unknown Key Input: %d", ch);
+            continue;
+            break;
+        }
+
+        if (selected_object.type == objtype_no_type)
+        {
+            sprintf(header, "No object there... try again.");
+            continue;
+        }
+
+        d->PC.carry[carry_index] = object();
+        d->PC.money += selected_object.value;
+
+        return carry_index;
+    }
+}
+
 int dropitem(dungeon_type *d)
 {
     char header[100];
@@ -1194,6 +1320,407 @@ void inspect(dungeon_type *d)
         {
             done = 1;
         }
+    }
+}
+
+void gotoTown(dungeon_type *d)
+{
+
+    const char *town =
+        "                                                            _|_\n"
+        "                                                             |\n"
+        "                                                            )A(\n"
+        "       ^ _______________________________                    | |\n"
+        "       [=U=U=U=U=U=U=U=U=U=U=U=U=U=U=U=]               ,  _+|_|+_  ,\n"
+        "       |.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.|              )A( |:|:|:| )A(\n"
+        "       |      +-+-+-+-+-+-+-+-+-+      |              | |---------| |\n"
+        "       |      |Armor and Weapons|      |         ,    | | Thielen | |    ,\n"
+        "       |      +-+-+-+-+-+-+-+-+-+      |        )A(_+_| |---------| |_+_)A(\n"
+        "       |.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.|        | |:|:| |:|:|:|:|:| |:|:| |\n"
+        "       |  _________  __ __  _________  |        | ||H|| ||H|H|H|H|| ||H|| |\n"
+        "     _ | |___   _  ||[]|[]||  _      | | _      | |:|:| |:|:|:|:|:| |:|:| |\n"
+        "    (!)||OPEN|_(!)_|| ,| ,||_(!)_____| |(!)     |_||H||_||H|===|H||_||H||_|\n"
+        "   .T~T|:.....:T~T.:|__|__|:.T~T.:....:|T~T.  ~^^\"      ~^^/   \\^^~      \"^^~   \n"
+        "--------------------------------------------------------------------------------  \n"
+        "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ |= _ _:_ _ =| _ _ _ _ _ _ _ _ _ _ _ _ _   \n"
+        "                                        |=    :    =|                             \n"
+        "________________________________________L___________J___________________________  \n"
+        "--------------------------------------------------------------------------------";
+    clear();
+    int row = 0;
+    int col = 0;
+    bool done = false;
+    position pc;
+    pc.x = 42;
+    pc.y = 15;
+
+    while (!done)
+    {
+
+        std::string header = "Welcome to the town! You can walk into either shop, or press escape!";
+
+        for (int i = 0; i < header.length(); i++)
+        {
+            mvaddch(0, i, header.at(i));
+        }
+        int row = 1;
+        int col = 0;
+        for (int i = 0; i < strlen(town); i++)
+        {
+            if (town[i] == '\n')
+            {
+                row++;
+                col = 0;
+                continue;
+            }
+            mvaddch(row, col, town[i]);
+            col++;
+        }
+
+        int maxhealth = 200;
+        for (int i = 0; i < 12; i++)
+        {
+            d->PC.speed += d->PC.inventory[i].speed;
+            maxhealth += d->PC.inventory[i].hit;
+        }
+
+        std::string hp = "Player Health: ";
+        hp += std::to_string(d->PC.hp);
+        hp.push_back('/');
+        hp += std::to_string(maxhealth);
+
+        for (int i = 0; i < hp.length(); i++)
+        {
+            mvaddch(22, i, hp.at(i));
+        }
+
+        std::string coins = "Player Money: ";
+        coins += std::to_string(d->PC.money);
+        coins += " coins";
+        for (int i = 0; i < hp.length(); i++)
+        {
+            mvaddch(22, i, hp.at(i));
+        }
+
+        for (int i = 80 - coins.length(); i < 80; i++)
+        {
+            mvaddch(22, i, coins.at(i - (80 - coins.length())));
+        }
+
+        mvaddch(pc.y, pc.x, '@');
+        refresh();
+        int ch = getch();
+
+        uint8_t yNext = pc.y;
+        uint8_t xNext = pc.x;
+
+        switch (ch)
+        {
+        case '7':
+        case 'y':
+            yNext--;
+            xNext--;
+            break;
+        case '8':
+        case 'k':
+            yNext--;
+            break;
+        case '9':
+        case 'u':
+
+            yNext--;
+            xNext++;
+            break;
+        case '6':
+        case 'l':
+
+            xNext++;
+            break;
+        case '3':
+        case 'n':
+            yNext++;
+            xNext++;
+            break;
+        case '2':
+        case 'j':
+            yNext++;
+            break;
+        case '1':
+        case 'b':
+            yNext++;
+            xNext--;
+            break;
+        case '4':
+        case 'h':
+            xNext--;
+            break;
+        case 27: //escape key
+
+            return;
+        }
+
+        //armor col: 20-26
+        //health 59-63
+        if (yNext >= 14 && yNext < 19 && xNext >= 0 && xNext < 80)
+        {
+            pc.x = xNext;
+            pc.y = yNext;
+        }
+
+        if (pc.y == 14)
+        {
+            if (pc.x >= 20 && pc.x <= 26)
+            {
+                armorShop(d);
+                pc.y = 15;
+            }
+
+            if (pc.x >= 59 && pc.x <= 63)
+            {
+                visithealthcenter(d);
+                pc.y = 15;
+            }
+        }
+    }
+}
+
+void armorShop(dungeon_type *d)
+{
+
+    object *objects = new object[3];
+
+    for (int i = 0; i < 3; i++)
+    {
+        objects[i] = object();
+
+        object_description desc;
+
+        desc = d->object_descriptions.at(rand() % (d->object_descriptions.size()));
+        position pos;
+        pos.x = 0;
+        pos.y = 0;
+
+        objects[i].set(desc.name, desc.description, desc.type, desc.color, desc.hit.roll(), desc.damage, desc.dodge.roll(), desc.defence.roll(), desc.weight.roll(), desc.speed.roll(), desc.attribute.roll(), desc.value.roll(), desc.artifact, desc.rarity, pos, true, -1);
+    }
+
+    char monster_string[100];
+    sprintf(monster_string, "Welcome to the Armor and weapons store! Press 1-3 to buy");
+    clear();
+
+    int done = 0;
+    while (!done)
+    {
+        clear();
+        for (int i = 0; i < strlen(monster_string); i++)
+        {
+            mvaddch(0, i, monster_string[i]);
+        }
+        for (int i = 0; i < 3; i++)
+        {
+            sprintf(monster_string, "[%d]: %c, %s COST: %d", i + 1, object_symbol[d->objects[i].type], objects[i].name.c_str(), objects[i].value);
+
+            for (int j = 0; j < strlen(monster_string); j++)
+            {
+                if (j == 5)
+                {
+                    attron(COLOR_PAIR(objects[i].color));
+                    mvaddch(i + 1, j, monster_string[j]);
+                    attroff(COLOR_PAIR(objects[i].color));
+                    continue;
+                }
+                mvaddch(i + 1, j, monster_string[j]);
+            }
+        }
+
+        int maxhealth = 200;
+        for (int i = 0; i < 12; i++)
+        {
+            d->PC.speed += d->PC.inventory[i].speed;
+            maxhealth += d->PC.inventory[i].hit;
+        }
+
+        std::string hp = "Player Health: ";
+        hp += std::to_string(d->PC.hp);
+        hp.push_back('/');
+        hp += std::to_string(maxhealth);
+
+        for (int i = 0; i < hp.length(); i++)
+        {
+            mvaddch(22, i, hp.at(i));
+        }
+
+        std::string coins = "Player Money: ";
+        coins += std::to_string(d->PC.money);
+        coins += " coins";
+        for (int i = 0; i < hp.length(); i++)
+        {
+            mvaddch(22, i, hp.at(i));
+        }
+
+        for (int i = 80 - coins.length(); i < 80; i++)
+        {
+            mvaddch(22, i, coins.at(i - (80 - coins.length())));
+        }
+
+        refresh();
+        int ch2 = getch();
+        object selectedobject;
+        switch (ch2)
+        {
+        case '1':
+            selectedobject = objects[0];
+            break;
+        case '2':
+            selectedobject = objects[1];
+            break;
+        case '3':
+            selectedobject = objects[2];
+            break;
+        case 27:
+            done = 1;
+            break;
+        default:
+            sprintf(monster_string, "Unknown Key Input: %d", ch2);
+            continue;
+            break;
+        }
+
+        int leftover_money = d->PC.money - selectedobject.value;
+        if (leftover_money < 0)
+        {
+            sprintf(monster_string, "You do not have enough money!");
+            continue;
+        }
+
+        int slot;
+        bool full = false;
+        for (int i = 0; i < 10; i++)
+        {
+            if (d->PC.carry[i].type == objtype_no_type)
+            {
+                d->PC.carry[i] = selectedobject;
+                slot = i;
+                break;
+            }
+            if (i == 9)
+            {
+                full = true;
+            }
+        }
+
+        if (!full)
+        {
+            d->PC.money = leftover_money;
+            sprintf(monster_string, "%s placed into carry slot #%d", selectedobject.name.c_str(), slot);
+        }
+        else
+        {
+            sprintf(monster_string, "Unable to purcase %s, inventory is full", selectedobject.name.c_str());
+        }
+    }
+}
+
+void visithealthcenter(dungeon_type *d)
+{
+
+    char monster_string[100];
+    sprintf(monster_string, "Welcome to Thielen! Press 1-3 to buy");
+    clear();
+
+    const std::string potion[3] = {"[1]: Minor health potion COST: 500", "[2]: Major health potion COST: 750", "[3]: Clone Cone COST: 1000"};
+
+    int done = 0;
+    while (!done)
+    {
+        clear();
+        for (int i = 0; i < strlen(monster_string); i++)
+        {
+            mvaddch(0, i, monster_string[i]);
+        }
+        for (int i = 0; i < 3; i++)
+        {
+
+            for (int j = 0; j < potion[i].length(); j++)
+            {
+                mvaddch(i + 1, j, potion[i].at(j));
+            }
+        }
+
+        int maxhealth = 200;
+        for (int i = 0; i < 12; i++)
+        {
+            d->PC.speed += d->PC.inventory[i].speed;
+            maxhealth += d->PC.inventory[i].hit;
+        }
+
+        std::string hp = "Player Health: ";
+        hp += std::to_string(d->PC.hp);
+        hp.push_back('/');
+        hp += std::to_string(maxhealth);
+
+        for (int i = 0; i < hp.length(); i++)
+        {
+            mvaddch(22, i, hp.at(i));
+        }
+
+        std::string coins = "Player Money: ";
+        coins += std::to_string(d->PC.money);
+        coins += " coins";
+        for (int i = 0; i < hp.length(); i++)
+        {
+            mvaddch(22, i, hp.at(i));
+        }
+
+        for (int i = 80 - coins.length(); i < 80; i++)
+        {
+            mvaddch(22, i, coins.at(i - (80 - coins.length())));
+        }
+        int cost;
+        int heal;
+        refresh();
+        int ch2 = getch();
+        switch (ch2)
+        {
+        case '1':
+            cost = 500;
+            heal = 50;
+            break;
+        case '2':
+            cost = 750;
+            heal = 100;
+            break;
+        case '3':
+            cost = 1000;
+            heal = 9999999;
+            break;
+        case 27:
+            done = 1;
+            break;
+        default:
+            sprintf(monster_string, "Unknown Key Input: %d", ch2);
+            continue;
+            break;
+        }
+
+        int leftover_money = d->PC.money - cost;
+        if (leftover_money < 0)
+        {
+            sprintf(monster_string, "You do not have enough money!");
+            continue;
+        }
+
+        if(d->PC.hp == maxhealth){
+            sprintf(monster_string, "You are already at max health!");
+            continue;
+        }
+
+        d->PC.money = leftover_money;
+
+        int oldHP = d->PC.hp;
+
+        d->PC.hp = std::min(maxhealth, d->PC.hp + heal);
+
+        sprintf(monster_string, "Healed the player %d points", d->PC.hp - oldHP);
     }
 }
 
@@ -1632,7 +2159,7 @@ void printFogDungeon(dungeon_type *d)
 
         if (xDis < 3 && yDis < 3)
         {
-            if (d->monsters[i].alive == 1 &&islineofsight(d, d->monsters[i].pos.y, d->monsters[i].pos.x, d->PC.pos))
+            if (d->monsters[i].alive == 1 && islineofsight(d, d->monsters[i].pos.y, d->monsters[i].pos.x, d->PC.pos))
             {
                 attron(COLOR_PAIR(d->monsters[i].color));
                 mvaddch(d->monsters[i].pos.y + 1, d->monsters[i].pos.x, d->monsters[i].to_string);
